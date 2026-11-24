@@ -1,0 +1,21 @@
+{
+  "figure": "Figure_S5",
+  "master": "artwork/Figure_S5.svg",
+  "data_export": "code/extract_data.py",
+  "final_size_mm": [
+    180,
+    53
+  ],
+  "columns": 2,
+  "renderer": "code/reproduce_figure.py",
+  "current_plot_inputs": [
+    "data/plot_values/coupled_mean_trajectories.csv"
+  ],
+  "drift": "Supplementary equation (S18)",
+  "case_order": [
+    "interior",
+    "boundary_clipped",
+    "near_stable",
+    "near_unstable"
+  ]
+}

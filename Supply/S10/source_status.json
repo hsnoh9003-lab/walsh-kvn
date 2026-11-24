@@ -1,0 +1,16 @@
+{
+  "figure": "Figure_S10",
+  "master": "artwork/Figure_S10.svg",
+  "renderer": "Source/Plotting/supplementary_resource_figures.py",
+  "reproduction": "code/reproduce_figure.py",
+  "current_plot_inputs": [
+    "data/plot_values/capacity_selected_designs.csv"
+  ],
+  "final_size_mm": [
+    180,
+    126
+  ],
+  "columns": 2,
+  "source_document": "Manuscript/KvN_Supplementary_v103.docx",
+  "plotted_quantity": "reference bars followed by error-rate sweeps"
+}

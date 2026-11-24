@@ -1,0 +1,107 @@
+{
+  "rows": 1960,
+  "positive_native_T_counts": 244,
+  "physical_error_probabilities": [
+    0.0002,
+    0.0003,
+    0.0004,
+    0.0005,
+    0.0006,
+    0.0007,
+    0.0008,
+    0.0009
+  ],
+  "colour_limits": {
+    "a": [
+      -25,
+      25
+    ],
+    "b": [
+      -40,
+      0
+    ]
+  },
+  "highlighted_rows": [
+    {
+      "p_phys": 0.0005,
+      "native_T": 7392,
+      "qubit_change_pct": -27.401060791513665,
+      "runtime_change_pct": 3.162281339280759
+    },
+    {
+      "p_phys": 0.0005,
+      "native_T": 200000,
+      "qubit_change_pct": -19.687202502379986,
+      "runtime_change_pct": 18.95396121901618
+    }
+  ],
+  "c": {
+    "core_distances": [
+      19,
+      21,
+      23,
+      25,
+      27,
+      29,
+      31
+    ],
+    "qubits": {
+      "xlim": [
+        18.25,
+        31.75
+      ],
+      "ylim": [
+        48826.8,
+        103489.2
+      ]
+    },
+    "runtime": {
+      "xlim": [
+        18.25,
+        31.75
+      ],
+      "ylim": [
+        64.81434239999999,
+        110.38260960000001
+      ]
+    }
+  },
+  "d": {
+    "core_distances": [
+      19,
+      21,
+      23,
+      25,
+      27,
+      29
+    ],
+    "qubits": {
+      "xlim": [
+        18.25,
+        29.75
+      ],
+      "ylim": [
+        55268.6,
+        100693.4
+      ]
+    },
+    "runtime": {
+      "xlim": [
+        18.25,
+        29.75
+      ],
+      "ylim": [
+        97.22600402599616,
+        158.94170371404218
+      ]
+    }
+  },
+  "e_physical_error_rows": 8,
+  "input_sha256": {
+    "native_T_sensitivity.csv": "9fce7dc9bbae0ad46e148808b0b847c4c25d3614badd1e7cf1b21ed0eaf899d6",
+    "supply_distances.csv": "14177fc07dfa1d062327ad1c3ade7a0bd382c453f98a7b8c0ef1f232d4909564",
+    "supply_optima.csv": "b3dee79e8cdf410a5954198503e021f114de946378714c6acd486984cd210527",
+    "control_distance_curves.csv": "12956cbbae8294c01fef79f55c24319ccb52677f9a34c809bc3c16172cc10153",
+    "control_distance_optima.csv": "053e04ebb3cd9deccd0069be668852855c334d64bf519b9601fe7889dc303d1d"
+  }
+}

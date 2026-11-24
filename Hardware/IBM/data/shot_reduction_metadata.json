@@ -1,0 +1,129 @@
+{
+  "method": "Uniform random subsampling without replacement of each archived count histogram.",
+  "subset_seed": 20261117,
+  "seed_search_performed": false,
+  "retained_budget_each": {
+    "4": 4000,
+    "6": 12000
+  },
+  "allocation_rule": "Round 1.25 times the largest plug-in 5% relative-RMS shot estimate across all propagated times and both radial observables up to a multiple of 2,000.",
+  "scope": "Empirical sensitivity analysis; not an independent hardware error certificate or a new device run.",
+  "model_validation": {
+    "replicates": 20000,
+    "seed": 2026111701,
+    "maximum_relative_RMS": 0.048202108999342276
+  },
+  "bootstrap": {
+    "resamples": 1000,
+    "seed_per_job": 0,
+    "interpretation": "Uncertainty for the retained measurement sample; no finite-population reduction is applied to plotted standard errors."
+  },
+  "acquisition_metadata_preserved": true,
+  "counts": {
+    "dT4_n4n5/n4_kvn_k0": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_kvn_k1": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_kvn_k2": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_kvn_k3": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_kvn_k4": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_ref_k1": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_ref_k2": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_ref_k3": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n4_ref_k4": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n5_kvn_k0": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n5_kvn_k1": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT4_n4n5/n5_ref_k1": {
+      "acquired": 16000,
+      "retained": 4000
+    },
+    "dT6_n4/n4_kvn_k0": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k1": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k2": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k3": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k4": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k5": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_kvn_k6": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k1": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k2": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k3": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k4": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k5": {
+      "acquired": 32000,
+      "retained": 12000
+    },
+    "dT6_n4/n4_ref_k6": {
+      "acquired": 32000,
+      "retained": 12000
+    }
+  },
+  "analysis_versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  }
+}

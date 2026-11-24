@@ -1,0 +1,38 @@
+{
+  "pinned_QuCF_revision": "f34f89c24eff4ab79d3ecdea72da3cec88dce94f",
+  "included_source_inputs_verified_by_sha256": 32,
+  "dt1_QuCF_public_files_verified_bytewise": [
+    "kvn.oracle",
+    "kvn_OUTPUT.hdf5"
+  ],
+  "regenerated_against_october_archive": [
+    "dt1_stmc_histogram.csv",
+    "t2_stmc_histogram.csv",
+    "source_count_audit.json"
+  ],
+  "aggregate_is_algebraically_reconstructed_from_source": true,
+  "ordered_25_qubit_evolution_rerun": false,
+  "cross_source_gate_optimization": false,
+  "dt1_histogram_rows": 1566,
+  "dt1_total": 108018555,
+  "dt1_source_histogram_sha256": "c77d577b4eff8585b66fd2d71e879b913be24196f412039744a69a6dc10d88e1",
+  "success_probability_from_archived_dt1_amplitudes": 0.8762773928256311,
+  "one_clean_compilation_reproduced_bytewise": true,
+  "primitive_verification": "Each distinct controlled primitive checked on superpositions with the work qubit initially zero; small block encodings checked against archived matrices.",
+  "basis_counts": {
+    "logical_qubits": 26,
+    "RZ": 307305994,
+    "direct_T": 5914351326,
+    "Clifford": 8781048741,
+    "CX": 5461507502
+  },
+  "resource_input_fields_verified": [
+    "logical_qubits",
+    "position_qubits",
+    "native_T",
+    "RZ",
+    "successful_shots",
+    "success_probability",
+    "source_angle_error_bound"
+  ]
+}

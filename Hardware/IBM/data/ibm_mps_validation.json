@@ -1,0 +1,72 @@
+{
+  "analysis_versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "MPS_logical_device_circuit_pairs": 25,
+  "checks": {
+    "logical_vs_device_probabilities": 8.770761894538737e-15,
+    "QASM_vs_independent_pair_rotations": 5.329070518200751e-15,
+    "reference_vs_MPS_initial": 1.4988010832439613e-15,
+    "logical_loader_infidelity": 2.220446049250313e-16,
+    "logical_device_state_infidelity": 1.6209256159527285e-14,
+    "logical_pair_state_infidelity": 5.551115123125783e-15
+  },
+  "preparation": [
+    {
+      "qubits": 4,
+      "cells": 16,
+      "bond_dimension": 2,
+      "target_mean": 0.9017043000000001,
+      "prepared_mean": 0.901704398992531,
+      "fidelity": 0.9999998151603912,
+      "target_TVD": 4.8180969831234556e-05,
+      "k0_raw_TVD_dT4_n4n5": 0.042317807790618625,
+      "k0_raw_TVD_dT6_n4": 0.030474057790618632
+    },
+    {
+      "qubits": 5,
+      "cells": 32,
+      "bond_dimension": 2,
+      "target_mean": 0.9017042999999998,
+      "prepared_mean": 0.9017044732930235,
+      "fidelity": 0.9999996254421848,
+      "target_TVD": 0.00019816413019577806,
+      "k0_raw_TVD_dT4_n4n5": 0.06330038624329451
+    },
+    {
+      "qubits": 6,
+      "cells": 64,
+      "bond_dimension": 2,
+      "target_mean": 0.9017042999999999,
+      "prepared_mean": 0.9017044961962583,
+      "fidelity": 0.999999562042422,
+      "target_TVD": 0.00021186832003267079
+    }
+  ],
+  "Walsh_terms_per_layer": {
+    "16": {
+      "even": 8,
+      "odd": 8
+    },
+    "32": {
+      "even": 15,
+      "odd": 15
+    },
+    "64": {
+      "even": 26,
+      "odd": 26
+    }
+  },
+  "64_cell_overlap_fidelity_with_manuscript_prepared_amplitude": 0.9999999999999922,
+  "target_mean_rounding": "New hardware target mean 0.9017043; original field target 0.9017043047820993.",
+  "original_CSV_max_central_rounding_difference": 4.852134861677015e-07,
+  "original_CSV_max_bootstrap_relative_difference": 0.016024354924465394,
+  "bootstrap": {
+    "resamples": 1000,
+    "seed_per_job": 0,
+    "scope": "Multinomial count resampling only; excludes systematic calibration mismatch."
+  },
+  "64_cell_scope": "Input approximation checked offline; no 64-cell hardware transport is reported."
+}

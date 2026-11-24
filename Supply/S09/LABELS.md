@@ -1,0 +1,1 @@
+Panels a and b show the percentage changes in time per attempt and physical qubits across the native T count and physical error. Circles mark the two circuits compared in panels c and d. Their core-distance ranges are 19–31 (wake) and 19–29 (control). Panel e gives the wake’s percentage changes across the physical error rates.

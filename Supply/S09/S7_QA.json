@@ -1,0 +1,211 @@
+{
+  "status": "PASS",
+  "dimensions_mm": [
+    180,
+    95
+  ],
+  "panels": [
+    {
+      "panel": "a",
+      "metric": "runtime_change_pct",
+      "baseline_values": [
+        0.0888064822925471,
+        -4.597582133129685,
+        -5.7969292324637545,
+        3.162233037837292,
+        4.173436458720281,
+        -5.362682384022999,
+        0.8870533582390872,
+        -0.917579384913092
+      ],
+      "matrix_shape": [
+        8,
+        244
+      ],
+      "min": -5.797101449275377,
+      "max": 19.69905071983116,
+      "colour_limits": [
+        -25.0,
+        25.0
+      ],
+      "infeasible_gray_cells": 0
+    },
+    {
+      "panel": "b",
+      "metric": "qubit_change_pct",
+      "baseline_values": [
+        -24.384133611691027,
+        -30.45947512211276,
+        -21.212871695807944,
+        -27.401060791513665,
+        -18.993156717934824,
+        -24.432622281906923,
+        -17.313909235994597,
+        -22.280301701455883
+      ],
+      "matrix_shape": [
+        8,
+        244
+      ],
+      "min": -33.15969551105934,
+      "max": -2.9598700997448435,
+      "colour_limits": [
+        -40.0,
+        0.0
+      ],
+      "infeasible_gray_cells": 0
+    }
+  ],
+  "separate_metric_colour_limits": [
+    [
+      -25.0,
+      25.0
+    ],
+    [
+      -40.0,
+      0.0
+    ]
+  ],
+  "refined_control_markers": [
+    {
+      "p_phys": 0.0009,
+      "native_T": 680000,
+      "RZ": 4803,
+      "strict_Q": 114020,
+      "relaxed_Q": 91523,
+      "strict_time_s": 298.262997,
+      "relaxed_time_s": 319.65421340259707,
+      "qubit_change_pct": -19.73074899140501,
+      "runtime_change_pct": 7.171931019856648,
+      "strict_d_core": 31,
+      "relaxed_d_core": 25,
+      "strict_factory_units": 1,
+      "relaxed_factory_units": 1,
+      "strict_factory_distances": 21,
+      "relaxed_factory_distances": 23,
+      "strict_T_per_RZ": 81,
+      "relaxed_T_per_RZ": 81,
+      "strict_T_core": 1069043,
+      "relaxed_T_core": 1069043,
+      "strict_core_period_s": 0.000279,
+      "relaxed_core_period_s": 0.000225,
+      "strict_service_period_s": 0.000279,
+      "relaxed_service_period_s": 0.0002990096875454,
+      "strict_wait_s": 0.0,
+      "relaxed_wait_s": 7.40096875454e-05,
+      "strict_block": "compact",
+      "relaxed_block": "compact",
+      "search_scope": "maximum over the declared inventory grid",
+      "maximization_scope": "original_range"
+    },
+    {
+      "p_phys": 0.0005,
+      "native_T": 210000,
+      "RZ": 4803,
+      "strict_Q": 73530,
+      "relaxed_Q": 59053,
+      "strict_time_s": 131.54265,
+      "relaxed_time_s": 157.45530334171,
+      "qubit_change_pct": -19.688562491500072,
+      "runtime_change_pct": 19.69905071983116,
+      "strict_d_core": 25,
+      "relaxed_d_core": 19,
+      "strict_factory_units": 1,
+      "relaxed_factory_units": 1,
+      "strict_factory_distances": 17,
+      "relaxed_factory_distances": 19,
+      "strict_T_per_RZ": 78,
+      "relaxed_T_per_RZ": 89,
+      "strict_T_core": 584634,
+      "relaxed_T_core": 637467,
+      "strict_core_period_s": 0.000225,
+      "relaxed_core_period_s": 0.0001709999999999,
+      "strict_service_period_s": 0.000225,
+      "relaxed_service_period_s": 0.0002470014970841,
+      "strict_wait_s": 0.0,
+      "relaxed_wait_s": 7.600149708420002e-05,
+      "strict_block": "compact",
+      "relaxed_block": "compact",
+      "search_scope": "maximum over the declared inventory grid",
+      "maximization_scope": "original_range"
+    }
+  ],
+  "refined_control_scope": "Observed high-slowdown samples within original0..1e7nativeT; no claim of proven global maximum",
+  "extended_inventory_diagnostic_not_rendered": true,
+  "all_axes_bounds": [
+    {
+      "bounds_px": [
+        66.18274278215222,
+        118.78923884514437,
+        407.99332894555033,
+        358.08083989501307
+      ],
+      "inside": true
+    },
+    {
+      "bounds_px": [
+        480.4724409448819,
+        131.75590551181102,
+        63.45952263779532,
+        350.61417322834643
+      ],
+      "inside": true
+    },
+    {
+      "bounds_px": [
+        587.0488845144357,
+        118.78923884514437,
+        407.9933289455503,
+        358.08083989501307
+      ],
+      "inside": true
+    },
+    {
+      "bounds_px": [
+        994.9606299212599,
+        131.75590551181102,
+        56.70952263779509,
+        350.61417322834643
+      ],
+      "inside": true
+    }
+  ],
+  "full_scan_ranges": {
+    "runtime_change_pct": [
+      -5.797101449275377,
+      19.69905071983116
+    ],
+    "qubit_change_pct": [
+      -33.15969551105934,
+      -2.9598700997448435
+    ]
+  },
+  "unlabelled_colour_saturation": false,
+  "all_eight_error_rates": [
+    0.0002,
+    0.00030000000000000003,
+    0.0004,
+    0.0005,
+    0.0006000000000000001,
+    0.0007,
+    0.0008,
+    0.0009000000000000001
+  ],
+  "full_inventory_count": 245,
+  "displayed_inventory_count": 244,
+  "flow_circuit_T": 7392,
+  "reference": "vertical dashed line; no separate column",
+  "input_sha256": {
+    "native_T_sensitivity.csv": "aa874f58505aae7f825a90dad1be9a9d6689498a7e34e59fc3332d4a7b0abe41",
+    "refined_runtime_controls.csv": "e37cb11d901f654c79d1df66ee6f0cb33b3de378da88999e677fdc5d30715223"
+  },
+  "policy": "Exactly one top-level MSF unit with waiting allowed versus supply-enforced required unit count; minimum footprint for each policy",
+  "optional_two_factory_diagnostics_excluded_from_paper": true,
+  "flat_sample_cells_without_smoothing": true,
+  "selected_waiting_unit_counts": [
+    1
+  ],
+  "selected_strict_unit_counts": [
+    1
+  ]
+}

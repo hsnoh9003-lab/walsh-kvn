@@ -1,0 +1,75 @@
+{
+  "jobs": {
+    "ibm_sampler_dT4": {
+      "job_id": "dbt4107q0h0s73bkah70",
+      "backend": "ibm_cleveland",
+      "primitive": "SamplerV2",
+      "submitted_kst": "2026-11-16 08:30",
+      "circuits": 9,
+      "shots_per_circuit": 8000,
+      "qpu_seconds": 24,
+      "mitigation": "gate+measurement twirling (32 randomizations), XpXm dynamical decoupling"
+    },
+    "ibm_estimator_zne_folding_dT4": {
+      "job_id": "dbt422fasvbs73b99o90",
+      "backend": "ibm_cleveland",
+      "primitive": "EstimatorV2 (resilience level 2)",
+      "submitted_kst": "2026-11-16 08:32",
+      "circuits": 5,
+      "shots": 16000,
+      "qpu_seconds": 87,
+      "mitigation": "TREX + ZNE gate folding (1,3,5), exponential/linear extrapolation, gate twirling, DD"
+    },
+    "ibm_sampler_dT6": {
+      "job_id": "dbt4p7nasvbs73b9aghg",
+      "backend": "ibm_cleveland",
+      "primitive": "SamplerV2",
+      "submitted_kst": "2026-11-16 09:21",
+      "circuits": 13,
+      "shots_per_circuit": 32000,
+      "qpu_seconds": 128,
+      "mitigation": "gate+measurement twirling (32 randomizations), XpXm dynamical decoupling"
+    },
+    "ibm_estimator_zne_pea": {
+      "job_id": "dbte0abeq3sc73evmp9g",
+      "backend": "ibm_cleveland",
+      "primitive": "server-side Estimator",
+      "submitted_kst": "2026-11-16 19:51",
+      "circuits": 12,
+      "shots": 16000,
+      "qpu_seconds": 492,
+      "mitigation": "TREX + ZNE with PEA (noise factors 1,1.5,2,3), exponential/linear extrapolation, gate+measurement twirling, DD"
+    },
+    "ibm_mps_dT4_n4n5": {
+      "job_id": "dbtg4b1vvpic738mugmg",
+      "backend": "ibm_cleveland",
+      "primitive": "SamplerV2",
+      "submitted_kst": "2026-11-16 22:18",
+      "circuits": 12,
+      "shots_per_circuit": 16000,
+      "qpu_seconds": 58,
+      "mitigation": "gate+measurement twirling (32), XpXm DD",
+      "input": "bond-2 MPS"
+    },
+    "ibm_mps_dT6_n4": {
+      "job_id": "dbtg8rvasvbs73b9n940",
+      "backend": "ibm_cleveland",
+      "primitive": "SamplerV2",
+      "submitted_kst": "2026-11-16 22:27",
+      "circuits": 13,
+      "shots_per_circuit": 32000,
+      "qpu_seconds": 128,
+      "mitigation": "gate+measurement twirling (32), XpXm DD",
+      "input": "bond-2 MPS"
+    }
+  },
+  "ibm_calibration": {
+    "backend": "ibm_cleveland",
+    "processor": "Heron r2",
+    "calibration_time": "2026-11-16 08:51:57+09:00",
+    "cz_error_median": 0.0017377489835096183,
+    "cz_error_q25": 0.001403005054074924,
+    "readout_error_median": 0.00634765625,
+    "note": "Supplied transpiler-target snapshot. Its timestamp is later than the first two job submissions; these medians are descriptive and are not asserted to be the exact calibration for every submission."
+  }
+}

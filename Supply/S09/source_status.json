@@ -1,0 +1,18 @@
+{
+  "source": "Matched minimum-qubit designs under waiting and enforced supply.",
+  "inputs": [
+    "native_T_sensitivity.csv",
+    "supply_distances.csv",
+    "supply_optima.csv",
+    "control_distance_curves.csv",
+    "control_distance_optima.csv",
+    "refined_runtime_controls.csv"
+  ],
+  "panels": {
+    "a": "runtime_change_pct",
+    "b": "qubit_change_pct",
+    "c": "wake_distance",
+    "d": "control_distance",
+    "e": "wake_physical_error"
+  }
+}

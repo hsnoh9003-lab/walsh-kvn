@@ -1,0 +1,1 @@
+Supplementary Figure S10 | How many consecutive steps permit 815 accepted shots per day. a, Maximum steps and T-state consumption interval at physical error probability 5 × 10⁻⁴. b,c, Maximum steps and nominal-to-actual core interval ratio across physical errors. Below one, the core waits for the factory. Shading marks the reference error. The wake accuracy test uses 33 steps.

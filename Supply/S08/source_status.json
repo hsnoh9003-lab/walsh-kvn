@@ -1,0 +1,17 @@
+{
+  "figure": "Figure_S8",
+  "master": "artwork/Figure_S8.svg",
+  "renderer": "Source/Plotting/supplementary_resource_figures.py",
+  "reproduction": "code/reproduce_figure.py",
+  "current_plot_inputs": [
+    "data/plot_values/implementation_budget_sensitivity.csv",
+    "data/plot_values/new_backend.csv"
+  ],
+  "final_size_mm": [
+    88,
+    82.0
+  ],
+  "columns": 1,
+  "width_in_supplement_mm": 116,
+  "source_artwork_width_mm": 88
+}

@@ -1,0 +1,28 @@
+{
+  "current_master": "artwork/Figure_5.svg",
+  "current_pdf": "pdf/Figure_5.pdf",
+  "current_renderer": "code/plot.py",
+  "numerical_reproduction": "T/SINDy12/",
+  "current_shots": {
+    "long298": 234,
+    "restart40": 104
+  },
+  "model_coefficients": 12,
+  "display_revision": 75,
+  "legend_order": [
+    "Near stable",
+    "Interior",
+    "Near unstable"
+  ],
+  "diamond_legend": "Shot-noise-free",
+  "numerical_data_changed": false,
+  "resource_scope_revision": 76,
+  "resource_physical_qubit_cap_applied": false,
+  "uncapped_check": "Data/One_Clean_Three_Coordinate/resources/uncapped_coupled_check/summary.json",
+  "all_eight_coupled_fastest_designs_unchanged": true,
+  "source_document": "Manuscript/KvN_Manuscript_v100.docx",
+  "source_paragraph": 56,
+  "source_caption_paragraph": 57,
+  "paragraph_index_convention": "Zero-based top-level Word paragraphs, excluding table cells.",
+  "caption_words_native_Writer": 149
+}

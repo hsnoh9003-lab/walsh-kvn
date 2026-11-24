@@ -1,0 +1,121 @@
+{
+  "figure": "Figure_4",
+  "master": "artwork/Figure_4.svg",
+  "renderer": "code/reproduce_from_data.py",
+  "data_export": "code/extract_data.py",
+  "panels": "a–f",
+  "numerical_scope": "Selected 12-coefficient classical error curves independently replayed; other retained arrays unchanged; plotting performs no fitting or propagation",
+  "former_Figure_6": "Validation frontier retained as b; cross-case graph omitted, results in SI Note 1",
+  "limitation": "Degree-study cost axes are illustrative Cartesian logical bounds only",
+  "master_width_mm": 88,
+  "master_height_mm": 170,
+  "caption_words_native_Writer": 143,
+  "panel_mapping_from_previous": {
+    "a": "a",
+    "b": "b",
+    "c": "c",
+    "d": "d",
+    "e": "e",
+    "f": "f",
+    "g": "omitted; numerical results in SI Note 1"
+  },
+  "layout_rows": [
+    [
+      "a"
+    ],
+    [
+      "b"
+    ],
+    [
+      "c",
+      "d"
+    ],
+    [
+      "e",
+      "f: drag/lift vertically"
+    ]
+  ],
+  "b_axes_height_mm": 24,
+  "force_axes_height_mm": 11,
+  "circuit_marker_count_panel_e": 34,
+  "colorbar": "Centered beneath both columns, label below",
+  "legend_positions": {
+    "c": "inside upper left",
+    "d": "inside lower left",
+    "f": "inside upper-left drag axis"
+  },
+  "cost_axis_scope": "Sum of one interior Walsh pair-rotation layer per coordinate across three coordinates on a common 64-cell Cartesian grid",
+  "filled_marker_definition": "Pareto-nondominated candidates",
+  "panel_b_annotations": "Grid-size scaling O((log N_x)^K), fixed coordinate count and degree; N_x and K defined",
+  "cost_axis_label": "Walsh rotations (upper bound)",
+  "force_axes_orientation": "vertical",
+  "adopted_model": {
+    "library_degree": 2,
+    "threshold": 0.03,
+    "rotation_support_bound": 226,
+    "validation_error_percent": 5.615663928805587
+  },
+  "error_bar_display": {
+    "shown": false,
+    "legend_shown": false,
+    "marker_size_pt": 3.0,
+    "standard_errors_retained_in_source_CSV": true
+  },
+  "force_view": {
+    "x_limits": [
+      0,
+      60
+    ],
+    "drag_limits": [
+      1.11,
+      1.38
+    ],
+    "lift_limits": [
+      -0.42,
+      0.42
+    ],
+    "circuit_interval_shading": [
+      40,
+      49.82906260206943
+    ],
+    "FEM_style": "solid",
+    "circuit_style": "solid"
+  },
+  "d_y_limits": [
+    0.22,
+    1.04
+  ],
+  "panel_d_box_aspect": 1,
+  "panel_d_axes_size_mm": [
+    22,
+    22
+  ],
+  "error_source": "../../Data/Source_Data_Figure_4e.csv",
+  "error_data_replay": "code/rebuild_error_data.py",
+  "panel_e_legend": [
+    "One state: 3-mode vs FEM",
+    "One state: Radial vs 3-mode",
+    "Ensemble: Circuit vs Radial"
+  ],
+  "panel_e_blue": "Noiseless ensemble field bias relative to matched continuum Radial field",
+  "panel_e_dotted": "1% relative RMS target including sampling and implementation errors",
+  "publication_series_names": [
+    "3-mode vs FEM",
+    "Radial vs 3-mode",
+    "Circuit vs Radial",
+    "1% RMS target (vs Radial)"
+  ],
+  "source_definitions": "../../Data/Source_Data_Figure_4e_Definitions.csv",
+  "circuit_readout_scope": {
+    "a_c_d": "exact ideal-circuit expectations",
+    "e_blue": "exact ideal-circuit field bias, no finite-shot draws",
+    "f_blue_line": "exact ideal-circuit force expectations",
+    "f_open_markers": "815 additional ideal shots shared per time between force estimators",
+    "field_815_budget": "separate RMS target including sampling and implementation errors"
+  },
+  "source_document": "Manuscript/KvN_Manuscript_v100.docx",
+  "source_paragraph": 49,
+  "plotted_data_filenames": "Figure4e_curves.csv supplies panel e. fig4f_fem_forces.csv and fig4f_walsh_forces.csv supply continuous curves in panel f. Source_Data_Figure_4f.csv supplies sampled forces.",
+  "source_caption_paragraph": 50,
+  "paragraph_index_convention": "Zero-based top-level Word paragraphs, excluding table cells."
+}

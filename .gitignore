@@ -1,0 +1,12 @@
+# Generated calculations and reproducibility output; input data live on Zenodo.
+/Build/
+**/reproduced/
+**/variants/
+**/__pycache__/
+*.py[cod]
+*.so
+*.pyd
+.ipynb_checkpoints/
+.venv/
+.venv-*/
+*.egg-info/

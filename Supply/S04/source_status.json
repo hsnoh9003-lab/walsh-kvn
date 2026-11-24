@@ -1,0 +1,16 @@
+{
+  "figure": "Figure_S4",
+  "master": "artwork/Figure_S4.svg",
+  "data_export": "code/extract_data.py",
+  "final_size_mm": [
+    180,
+    125.0
+  ],
+  "columns": 2,
+  "renderer": "code/reproduce_figure.py",
+  "current_plot_inputs": [
+    "data/plot_values/scalar_conservative_cell_masses.csv",
+    "Data/Details/Table_S4_input_diagnostics.csv"
+  ],
+  "density_from_mass": "cell mass divided by cell width"
+}

@@ -1,0 +1,1 @@
+Current labels are regenerated with python code/reproduce_figure.py. Exact archived numerical geometry is retained in input/terminology_v36.svg. Scientific data, CSV column names and simulation programs remain in their original locations. F4/F5 also retain code/reproduce_from_data.py. The label replay is the final display step and performs no new resource optimization.
