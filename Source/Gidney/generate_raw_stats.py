@@ -5,8 +5,8 @@ The published experiment used the Strilanc magic-state cultivation circuits:
 end2end-inplace-distillation, Y basis, css gateset, uniform physical noise,
 d1=3, r1=d1, r2=5, and d2=7,9,...,25. Sinter uses the desaturation
 decoder. Shot targets below match the *observed per-distance counts* of the
-released v100/SI103 Source Data; some distances received more shots than
-others. p=5e-4 is an independent 10-billion-shot study.
+released Source Data. Completed acquisitions have uniform counts within
+each physical-error value. p=5e-4 is an independent 10-billion-shot study.
 
 This file owns circuit creation and raw Sinter collection only. The companion
 build_tradeoff.py reconstructs the gap-filtered P_prep and e_prep estimates.
@@ -15,7 +15,7 @@ Neither script modifies published Source Data by default.
 Prerequisite: the original Strilanc cultivation repository, with its
 tools/make_circuits command, and its Cultiv/Sinter/StIM environment.
 
-Examples (from Codes/):
+Examples (from the GitHub repository root):
   python -m Source.Gidney.generate_raw_stats
   python -m Source.Gidney.generate_raw_stats --cultiv-repo /path/to/cultivation \
       --p 5 --d2 7 --workers 32 --execute
@@ -24,6 +24,16 @@ Without --execute this prints the full collection plan and writes nothing.
 """
 
 from __future__ import annotations
+
+# Direct-file execution must locate Codes/ independently of the working directory.
+if __package__ in (None, ""):
+    import sys as _path_sys
+    from pathlib import Path as _Path
+    _codes = next(p for p in _Path(__file__).resolve().parents
+                  if (p / "Source/data_locations.py").is_file())
+    _path_sys.path.insert(0, str(_codes))
+
+from Source.data_locations import generated_outputs_root
 
 import argparse
 import os
@@ -36,21 +46,15 @@ PHYSICAL_ERROR_INDICES = tuple(range(2, 10))
 D2_VALUES = tuple(range(7, 26, 2))
 D1, R2, BASIS, GATESET, DECODER = 3, 5, "Y", "css", "desaturation"
 
-# Published total shots by distance, d2 = 7, 9, ..., 25 (2026-11-24 release).
-# Entries below are not uniform nominal p-specific targets. They reproduce
-# the final per-distance acquisition plan, including selectively extended jobs.
+# Observed total shots by distance, d2 = 7, 9, ..., 25.
+# Five-rate completion integrated on 2026-11-27; p=5,8,9 retain their measurements.
 SHOTS_BY_P = {
-    2: (1252716851, 1170271539, 1119368499, 20000000000, 20000000000,
-        20000000000, 20000000000, 20000000000, 1026447667, 1021695283),
-    3: (800000000, 800000000, 800000000, 800000000, 10000000000,
-        10000000000, 10000000000, 10000000000, 10000000000, 800000000),
-    4: (800000000, 800000000, 800000000, 800000000, 4000000000,
-        4000000000, 4000000000, 4000000000, 4000000000, 4000000000),
+    2: (20000000000,) * 10,
+    3: (10000000000,) * 10,
+    4: (4000000000,) * 10,
     5: (10000000000,) * 10,
-    6: (800000000, 800000000, 800000000, 1200000000, 800000000,
-        1200000000, 1200000000, 1200000000, 1200000000, 1200000000),
-    7: (800000000, 800000000, 800000000, 1000000000, 1000000000,
-        800000000, 1000000000, 1000000000, 1000000000, 1000000000),
+    6: (1200000000,) * 10,
+    7: (1000000000,) * 10,
     8: (800000000,) * 10,
     9: (800000000,) * 10,
 }
@@ -115,7 +119,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--cultiv-repo", type=Path,
                     help="Checkout of Strilanc magic-state cultivation, containing tools/make_circuits")
-    ap.add_argument("--output-root", type=Path, default=Path("Build/Gidney/raw_stats"))
+    ap.add_argument("--output-root", type=Path, default=(generated_outputs_root() / 'Gidney/raw_stats'))
     ap.add_argument("--p", type=int, nargs="+", choices=PHYSICAL_ERROR_INDICES,
                     help="Physical error probabilities, in units of 1e-4 (default: show all)")
     ap.add_argument("--d2", type=int, nargs="+", choices=D2_VALUES,

@@ -1,12 +1,21 @@
-# Generated calculations and reproducibility output; input data live on Zenodo.
-/Build/
-**/reproduced/
-**/variants/
+# Include the delivered code and Generated_Outputs/ in Git.
+# Ignore only local caches, environments and compiled artifacts.
 **/__pycache__/
 *.py[cod]
 *.so
 *.pyd
+*.dll
 .ipynb_checkpoints/
 .venv/
 .venv-*/
 *.egg-info/
+
+# Local configuration and data; keep a shareable environment template.
+.env
+.env.*
+!.env.example
+.DS_Store
+/Source_Data/
+
+# Local publication preparation notes and temporary scripts.
+/Work_Notes/

@@ -179,5 +179,5 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--mesh',default='coarse');p.add_argument('--dt',type=float,default=.02)
     p.add_argument('--end',type=float,default=90.);p.add_argument('--case',default='train')
     p.add_argument('--out',type=Path,required=True)
-    p.add_argument('--input',type=Path,default=Path('/workspace/scratch/0330816e51b0/force_data_raw/current/inputs/steady_coarse.npz'))
+    p.add_argument('--input',type=Path,required=True, help='Path to the archived steady_coarse.npz input')
     a=p.parse_args();run(a.mesh,a.dt,a.end,a.case,a.out,a.input)

@@ -1,7 +1,8 @@
-"""Native gate-count compiler for the current 12-coefficient Fourier–Walsh circuit.
+"""Count native gates for the 12-coefficient Fourier-Walsh transport circuit.
 
-The old standalone archive-dependent CLI is intentionally not carried over.
-"""
+Sparse mask-to-coefficient dictionaries encode Walsh polynomials on the
+radial, angular Fourier-mode and shift-coordinate registers."""
+
 from collections import Counter
 from dataclasses import dataclass
 import numpy as np
@@ -9,22 +10,30 @@ from . import wake_gate_core as core
 
 
 def multiply_walsh(left, right):
+    """Multiply Walsh polynomials using mask XOR for character products."""
     result = {}
     for a, ca in left.items():
         for b, cb in right.items():
-            result[a ^ b] = result.get(a ^ b, 0.) + ca * cb
+            result[a ^ b] = result.get(a ^ b, 0.0) + ca * cb
     return result
 
+
 def add(*terms):
+    """Sum scaled mask-to-coefficient dictionaries and drop exact zeros."""
     result = {}
     for scalar, poly in terms:
         for mask, value in poly.items():
-            result[mask] = result.get(mask, 0.) + scalar * value
-    return {mask: value for mask, value in result.items() if value != 0.}
+            result[mask] = result.get(mask, 0.0) + scalar * value
+    return {mask: value for mask, value in result.items() if value != 0.0}
 
 
 def product(left, right):
-    return {mask: value for mask, value in multiply_walsh(left, right).items() if value != 0.}
+    """Multiply sparse Walsh polynomials and drop exact zeros."""
+    return {
+        mask: value
+        for mask, value in multiply_walsh(left, right).items()
+        if value != 0.0
+    }
 
 
 def constant(value):
@@ -32,14 +41,23 @@ def constant(value):
 
 
 def restrict(poly, bits):
-    return add(*[((-1.) ** ((mask & bits).bit_count()), {mask & ~bits: val})
-                 for mask, val in poly.items()])
+    """Fix the selected register bits to one and remove them from parity masks."""
+    return add(
+        *[
+            ((-1.0) ** ((mask & bits).bit_count()), {mask & ~bits: val})
+            for mask, val in poly.items()
+        ]
+    )
 
 
 @dataclass(frozen=True)
 class Register:
+    """Uniform coordinate grid encoded by little-endian bits at a register offset."""
+
+    # size: grid points; offset: least-significant bit in the joint register.
     size: int
     offset: int
+    # start/spacing use the units of this coordinate (or Fourier-mode index).
     start: float
     spacing: float
 
@@ -47,7 +65,7 @@ class Register:
     def n(self):
         return self.size.bit_length() - 1
 
-    def coord(self, anchor=0., omitted=None):
+    def coord(self, anchor=0.0, omitted=None):
         terms = constant(self.start + anchor * self.spacing)
         for bit in range(self.n):
             if bit == omitted:
@@ -59,6 +77,8 @@ class Register:
 
 @dataclass(frozen=True)
 class Layer:
+    """One axis, matching parity and Fourier harmonic in the transport schedule."""
+
     axis: str
     axis_span: int = 0
     axis_parity: int = 0
@@ -67,35 +87,47 @@ class Layer:
 
 
 def schedule(stencil, order):
+    """Build the second-order spatial and Fourier-mode layer schedule."""
+    if stencil != 2:
+        raise ValueError("Three-coordinate transport uses stencil=2")
     result = []
     for axis in order:
-        distances = (0,) if axis == "k" else ((1,) if stencil == 2 else (1, 2))
+        distances = (0,) if axis == "k" else (1,)
         for distance in distances:
-            for parity in ((0,) if axis == "k" else (0, 1)):
+            for parity in (0,) if axis == "k" else (0, 1):
                 result.append(Layer(axis, distance, parity))
-                result.extend(Layer(axis, distance, parity, harmonic, k_parity)
-                              for harmonic in ("cos", "sin") for k_parity in (0, 1))
+                result.extend(
+                    Layer(axis, distance, parity, harmonic, k_parity)
+                    for harmonic in ("cos", "sin")
+                    for k_parity in (0, 1)
+                )
     return result
 
 
 def polar_polynomials(axis, radius, z, c):
+    """Return the constant, cos(2 theta) and sin(2 theta) drift polynomials."""
     if axis == "z":
         g, h, j = (c[4, 2] + c[7, 2]) / 2, (c[4, 2] - c[7, 2]) / 2, c[5, 2] / 2
         r2 = product(radius, radius)
-        return (add((c[3, 2], z), (c[9, 2], product(z, z)), (g, r2)),
-                add((h, r2)), add((j, r2)))
+        return (
+            add((c[3, 2], z), (c[9, 2], product(z, z)), (g, r2)),
+            add((h, r2)),
+            add((j, r2)),
+        )
     a = add((1, constant(c[1, 0])), (c[6, 0], z))
     b = add((1, constant(c[2, 0])), (c[8, 0], z))
     e = add((1, constant(c[1, 1])), (c[6, 1], z))
     d = add((1, constant(c[2, 1])), (c[8, 1], z))
-    mean, anisotropy = add((.5, a), (.5, d)), add((.5, a), (-.5, d))
-    symmetric, skew = add((.5, b), (.5, e)), add((.5, e), (-.5, b))
+    mean, anisotropy = add((0.5, a), (0.5, d)), add((0.5, a), (-0.5, d))
+    symmetric, skew = add((0.5, b), (0.5, e)), add((0.5, e), (-0.5, b))
     if axis == "r":
         return tuple(product(radius, p) for p in (mean, anisotropy, symmetric))
     return skew, symmetric, add((-1, anisotropy))
 
 
 def coefficient(layer, regs, c, stencil, span1):
+    if stencil != 2:
+        raise ValueError("Three-coordinate transport uses stencil=2")
     harmonic_index = ("dc", "cos", "sin").index(layer.harmonic)
     r = regs["r"].coord()
     z = regs["z"].coord()
@@ -110,17 +142,23 @@ def coefficient(layer, regs, c, stencil, span1):
         step = regs[layer.axis].spacing
 
         def at(shift):
-            point = regs[layer.axis].coord(anchor=layer.axis_parity * span + shift, omitted=omitted)
-            return polar_polynomials(layer.axis, point if layer.axis == "r" else r,
-                                     point if layer.axis == "z" else z, c)[harmonic_index]
+            point = regs[layer.axis].coord(
+                anchor=layer.axis_parity * span + shift, omitted=omitted
+            )
+            return polar_polynomials(
+                layer.axis,
+                point if layer.axis == "r" else r,
+                point if layer.axis == "z" else z,
+                c,
+            )[harmonic_index]
 
-        if stencil == 2 and span1 == "face":
+        if span1 == "face":
             p = add((1 / (2 * step), at(span / 2)))
         else:
-            d = .5 if stencil == 2 else (2 / 3 if span == 1 else -1 / 12)
+            d = 0.5
             p = add((d / (2 * step), at(0)), (d / (2 * step), at(span)))
     # The Fourier sine multiplier on the ordered (k,k+2) pair is -Y/2.
-    return add(((1., .5, -.5)[harmonic_index], p))
+    return add(((1.0, 0.5, -0.5)[harmonic_index], p))
 
 
 def gray_rank(mask):
@@ -178,8 +216,10 @@ def matching_guard(reg, span, work, flag):
     bit = span.bit_length() - 1
     width = reg.n - bit
     wires = list(range(reg.offset + bit, reg.offset + reg.n))
-    shift = [(name, [wires[q] if q < width else q for q in qs], angle)
-             for name, qs, angle in core.increment(width, work)]
+    shift = [
+        (name, [wires[q] if q < width else q for q in qs], angle)
+        for name, qs, angle in core.increment(width, work)
+    ]
     high = wires[1:]
     flag_gates = core.mcx(high, flag, work)
     return core.inverse(shift), flag_gates, sum(1 << q for q in high)
@@ -205,9 +245,15 @@ def compile_layer(layer, regs, c, dt, stencil, span1, work, flags):
         shift, guard, bits = matching_guard(reg, span, work, flag)
         permute.extend(shift)
         compute.extend(guard)
-        valid_delta = {0: -.5, 1 << flag: .5}
+        valid_delta = {0: -0.5, 1 << flag: 0.5}
         p = add((1, p), (1, product(valid_delta, restrict(p, bits))))
-    return permute + compute + pauli_rotation(p, word, dt) + core.inverse(compute) + core.inverse(permute)
+    return (
+        permute
+        + compute
+        + pauli_rotation(p, word, dt)
+        + core.inverse(compute)
+        + core.inverse(permute)
+    )
 
 
 def rz_gate(wire, angle):
@@ -238,11 +284,19 @@ def settings(sizes, rrange, zrange):
     bits = [n.bit_length() - 1 for n in sizes]
     assert all(n == 1 << b and b >= 2 for n, b in zip(sizes, bits))
     regs = {
-        "k": Register(nt, 0, -nt / 2, 1.),
-        "r": Register(nr, bits[1], rrange[0] + (rrange[1] - rrange[0]) / (2 * nr),
-                      (rrange[1] - rrange[0]) / nr),
-        "z": Register(nz, bits[1] + bits[0], zrange[0] + (zrange[1] - zrange[0]) / (2 * nz),
-                      (zrange[1] - zrange[0]) / nz),
+        "k": Register(nt, 0, -nt / 2, 1.0),
+        "r": Register(
+            nr,
+            bits[1],
+            rrange[0] + (rrange[1] - rrange[0]) / (2 * nr),
+            (rrange[1] - rrange[0]) / nr,
+        ),
+        "z": Register(
+            nz,
+            bits[1] + bits[0],
+            zrange[0] + (zrange[1] - zrange[0]) / (2 * nz),
+            (zrange[1] - zrange[0]) / nz,
+        ),
     }
     n = sum(bits)
     # Match the radial compiler's exact one-clean MCX decomposition.  The two
@@ -254,5 +308,3 @@ def settings(sizes, rrange, zrange):
 
 def getcounts(gates):
     return Counter(gate[0] for gate in gates)
-
-

@@ -1,4 +1,20 @@
-"""Test one-axis half grids using the adopted model and production Gaussians."""
+"""Test one-axis half grids using the adopted model and production Gaussians.
+
+Read the current protocol from KvN/inputs. Each run retains its current
+spatial stencil and time-step count while rebuilding the input on the
+modified grid. Results include both the bias and the sampling/circuit cost.
+"""
+
+# Direct-file execution must locate Codes/ independently of the working directory.
+if __package__ in (None, ""):
+    import sys as _path_sys
+    from pathlib import Path as _Path
+    _codes = next(p for p in _Path(__file__).resolve().parents
+                  if (p / "Source/data_locations.py").is_file())
+    _path_sys.path.insert(0, str(_codes))
+
+
+from Source.data_locations import generated_outputs_root
 from pathlib import Path
 import os
 for key in ['OMP_NUM_THREADS','OPENBLAS_NUM_THREADS','MKL_NUM_THREADS']:os.environ[key]='1'
@@ -10,12 +26,14 @@ PACKAGE=Path(__file__).resolve().parents[2]
 ROOT=shared_data('MPS_KvN_inputs','KvN')
 
 def main(run,axis,grid_override=None):
-    config=json.loads((ROOT/'transport_final'/run/'protocol.json').read_text())
+    config=json.loads((ROOT/'inputs'/run/'protocol.json').read_text())
+    # Change the selected grid axis while retaining the archived physical domain, transport window, and model protocol.
     if grid_override is None:config['grid_r_theta_z'][axis]//=2
     else:config['grid_r_theta_z']=list(grid_override)
     key=f'{run}_half_{axis}' if grid_override is None else run+'_n'+'_'.join(map(str,grid_override))
-    out=PACKAGE/'Build/KvN/grid_checks'/key;out.mkdir(parents=True,exist_ok=True)
+    out=generated_outputs_root() / 'KvN/grid_checks'/key;out.mkdir(parents=True,exist_ok=True)
     (out/'protocol.json').write_text(json.dumps(config,indent=2)+'\n')
+    # Rebuild the physical Gaussian on the modified grid and compile a new MPS, because the original grid amplitudes cannot be reused unchanged.
     target,norm=E.make_input(config)
     for chi in [2,4,8,16,32,64]:
         amp,blocks,base,prep=E.compress(target.ravel(),chi)
@@ -30,7 +48,8 @@ def main(run,axis,grid_override=None):
     nr,nt,nz=config['grid_r_theta_z'];model=E.load('candidate')
     args=argparse.Namespace(output=out,model=model,grid=config['grid_r_theta_z'],steps=config['steps'],rrange=config['rrange'],zrange=config['zrange'],
         stencil=config['stencil'],quadrature=12,restart=None,no_save_preparation=True,start=config['time_window'][0],
-        initial_probability_integral=norm,prepared_amplitude=amp.reshape(nz,nr,nt),reference_csv=ROOT/'transport_final'/run/'reference.csv')
+        initial_probability_integral=norm,prepared_amplitude=amp.reshape(nz,nr,nt),reference_csv=shared_data('MPS_KvN_inputs','MPS','domain_selection',run,'reference.csv'))
+    # Replay transport from the independently prepared coarse-grid state against the archived reference field.
     E.transport.replay(args)
     raw=json.loads((out/'terminal_readout.json').read_text());budget=E.field_budget(raw,1e-4,.01)
     (out/'field_budget.json').write_text(json.dumps(budget,indent=2)+'\n')

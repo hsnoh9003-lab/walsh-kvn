@@ -1,8 +1,14 @@
-"""Portable v38 RE regression suite.
+"""Check reproducibility of stored resource-design evaluations.
 
-Run: python -m Source.RE.verify
-Tests geometry and selected synthesis at 384 stored designs; the global
-optimum is not recomputed by exhaustive independent search.
+Reevaluate stored architectures and synthesis selections with their recorded
+calibration inputs, then compare costs with the reference tables. The current
+second-order growth designs use the updated calibration; the other publication
+records retain the previous calibration where it differs.
+
+Run from the Codes directory:
+    python -m Source.RE.verify
+
+This suite does not repeat an exhaustive architecture search.
 """
 from __future__ import annotations
 from pathlib import Path
@@ -17,18 +23,33 @@ from Source.data_locations import shared_data
 
 ROOT=Path(__file__).resolve().parents[2]
 DATA=shared_data('RE_common','RE')
+PREVIOUS_CALIBRATION=shared_data('Gidney_cultivation','update_20261127/previous_calibration')
 
+# Reuse the stored code distances and factory unit counts to recompute area,
+# errors, synthesis cost, and runtime.
+# Additional checks cover patch rounding, level-local storage, mean routing
+# lengths, and a basic Pareto case.
+#
+# Passing these checks establishes consistency with the stored evaluations.
+# It does not independently establish global optimality or validate the
+# physical error model.
 def check():
-    workloads=load_workloads(DATA/'workloads_v38.json')
+    workloads=load_workloads(DATA/'workloads.json')
     totals={'selected':0,'capped_selected':0,'l2':0}
-    for tag,filename in [('selected','v38_reference_selected.csv'),
-                         ('capped_selected','v38_reference_capped_selected.csv')]:
+    for tag,filename in [('selected','reference_selected.csv'),
+                         ('capped_selected','reference_capped_selected.csv')]:
         with (DATA/filename).open(newline='') as fh:
             for r in csv.DictReader(fh):
                 model=r['model'];p_phys=float(r['p_phys']);block=r['block'];
                 d_core=int(r['d_core']);d_levels=tuple(map(int,r['distances'].split(':')));
                 u_levels=tuple(map(int,r['u_levels'].split(':')));rate_index=round(p_phys*1e4)
-                cfg=make_config(p_phys,DATA/f'prep_p{rate_index}.csv',block,workloads[model])
+                prep_table=DATA/f'prep_p{rate_index}.csv'
+                previous=PREVIOUS_CALIBRATION/f'prep_p{rate_index}.csv'
+                # Match the input provenance of the record under test, rather
+                # than comparing an old design with a different calibration.
+                if model!='long298' and previous.exists():
+                    prep_table=previous
+                cfg=make_config(p_phys,prep_table,block,workloads[model])
                 geom=raw_geometry(p_phys,block,cfg,d_core,d_levels,u_levels)
                 assert geom is not None,(model,p_phys,block,'missing geometry')
                 rec=select_work(geom,model,workloads[model])

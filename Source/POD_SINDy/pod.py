@@ -6,6 +6,7 @@ from scipy.optimize import least_squares
 
 
 def reflect(fields):
+    """Reflect (time, component, y, x) velocity fields across the wake centreline."""
     # fields: (time, velocity component, y, x); reflection reverses y and v.
     reflected = fields[:, :, ::-1, :].copy()
     reflected[:, 1] *= -1
@@ -13,6 +14,7 @@ def reflect(fields):
 
 
 def decompose(fields):
+    """Return flattened symmetric and antisymmetric velocity components."""
     reflected = reflect(fields)
     shape = (len(fields), -1)
     # Symmetric/antisymmetric parts: (u+Ru)/2 and (u-Ru)/2.
@@ -22,7 +24,7 @@ def decompose(fields):
     )
 
 
-def fit_oscillatory_pair(times, fields, scale_mode='legacy_cubic_fit'):
+def fit_oscillatory_pair(times, fields, scale_mode="legacy_cubic_fit"):
     """Keep the existing fixed linear coordinates to isolate the shift change.
 
     The retained preliminary cubic-trajectory fit determines a constant scale;
@@ -50,46 +52,64 @@ def fit_oscillatory_pair(times, fields, scale_mode='legacy_cubic_fit'):
         # Optional preliminary scale fit: drho/dt = rate*rho*(1-(rho/limit)^2).
         rate, limit = np.exp(logs)
         solution = solve_ivp(
-            lambda _, y: rate*y*(1-(y/limit)**2),
-            (times[0], times[-1]), [rho[0]], t_eval=times,
-            method='DOP853', rtol=1e-10, atol=1e-12,
+            lambda _, y: rate * y * (1 - (y / limit) ** 2),
+            (times[0], times[-1]),
+            [rho[0]],
+            t_eval=times,
+            method="DOP853",
+            rtol=1e-10,
+            atol=1e-12,
         )
         if not solution.success or solution.y.shape[1] != len(times):
-            raise RuntimeError('Constant-scale fit failed')
+            raise RuntimeError("Constant-scale fit failed")
         return solution.y[0] - rho
 
-    if scale_mode == 'legacy_cubic_fit':
+    if scale_mode == "legacy_cubic_fit":
         fit = least_squares(
-            residual, np.log([.1, 1.]), max_nfev=500,
-            xtol=1e-12, ftol=1e-12, gtol=1e-12,
+            residual,
+            np.log([0.1, 1.0]),
+            max_nfev=500,
+            xtol=1e-12,
+            ftol=1e-12,
+            gtol=1e-12,
         )
         assert fit.success
         rate, limit = np.exp(fit.x)
         rate, fit_rmse = float(rate), float(np.sqrt(np.mean(fit.fun**2)))
-    elif scale_mode == 'training_rms':
+    elif scale_mode == "training_rms":
         limit = np.sqrt(np.mean(rho**2))
         rate, fit_rmse = None, None
     else:
         raise ValueError(scale_mode)
     return dict(
-        pod_modes=modes, W=W, legacy_limit=float(limit), xy=ab/limit, pair=pair*limit,
+        pod_modes=modes,
+        W=W,
+        legacy_limit=float(limit),
+        xy=ab / limit,
+        pair=pair * limit,
         meta=dict(
-            scale_mode=scale_mode, preliminary_constant_scale=float(limit),
-            preliminary_rate=rate, preliminary_fit_rmse=fit_rmse,
-            two_mode_energy_fraction=float(np.sum(singular[:2]**2)/np.sum(singular**2)),
+            scale_mode=scale_mode,
+            preliminary_constant_scale=float(limit),
+            preliminary_rate=rate,
+            preliminary_fit_rmse=fit_rmse,
+            two_mode_energy_fraction=float(
+                np.sum(singular[:2] ** 2) / np.sum(singular**2)
+            ),
         ),
     )
 
 
 def project(b, fields):
+    """Project fields onto row-wise modes using their full Gram matrix."""
     # Gram*a = Phi*(u-reference): project onto the possibly non-unit spatial modes.
     return np.linalg.solve(
-        b['Phi'] @ b['Phi'].T,
-        ((fields.reshape(len(fields), -1)-b['reference']) @ b['Phi'].T).T,
+        b["Phi"] @ b["Phi"].T,
+        ((fields.reshape(len(fields), -1) - b["reference"]) @ b["Phi"].T).T,
     ).T
 
 
 def closure(x):
+    """Fit the zero-intercept relation a3 = c2 * (a1**2 + a2**2)."""
     # Fit a3 = c2*(a1^2+a2^2), constraining the intercept to zero.
-    rho2 = np.sum(x[:, :2]**2, axis=1)
-    return np.array([0., float(rho2@x[:, 2]/(rho2@rho2))])
+    rho2 = np.sum(x[:, :2] ** 2, axis=1)
+    return np.array([0.0, float(rho2 @ x[:, 2] / (rho2 @ rho2))])

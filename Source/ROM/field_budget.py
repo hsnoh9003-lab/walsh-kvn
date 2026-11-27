@@ -1,12 +1,16 @@
-"""Terminal ensemble error and expected RMS shot budget, unchanged v38 equations."""
-import itertools,math
+"""Terminal ensemble error and expected RMS shot budget."""
+
+import itertools, math
 import numpy as np
+
 
 def finite_observable_ranges(centres, polar=True):
     """Return value and pair-product ranges on a discrete joint support."""
     axes = [np.asarray(axis, dtype=float) for axis in centres]
     assert len(axes) == 3
-    assert all(axis.ndim == 1 and len(axis) and np.all(np.isfinite(axis)) for axis in axes)
+    assert all(
+        axis.ndim == 1 and len(axis) and np.all(np.isfinite(axis)) for axis in axes
+    )
     if polar:
         r, theta, z = axes
         assert min(r) >= 0.0
@@ -26,6 +30,7 @@ def finite_observable_ranges(centres, polar=True):
                 products = np.outer([minima[i], maxima[i]], [minima[j], maxima[j]])
             product_widths[i, j] = product_widths[j, i] = np.ptp(products)
     return maxima - minima, product_widths
+
 
 def field_budget(raw, implementation_allowance, target_rms, polar=True):
     """Conservative expected squared relative field error of a sample mean."""
@@ -60,12 +65,15 @@ def field_budget(raw, implementation_allowance, target_rms, polar=True):
     bias_sq = max(0.0, bias_sq)
     variance = max(0.0, variance)
     variance_bound = variance + float(np.sum(np.abs(metric) * covariance_change))
-    reported = raw.get("ideal_relative_field_bias", raw.get("deterministic_relative_field_bias"))
+    reported = raw.get(
+        "ideal_relative_field_bias", raw.get("deterministic_relative_field_bias")
+    )
     if reported is not None:
         assert math.isclose(math.sqrt(bias_sq), reported, rel_tol=1e-8, abs_tol=1e-12)
     reported_variance = raw.get("ideal_per_shot_field_variance")
     if reported_variance is not None:
         assert math.isclose(variance, reported_variance, rel_tol=1e-10, abs_tol=1e-12)
+    # Expected squared error <= bias_bound_sq + variance_bound / accepted_shots.
     room = target_rms**2 - bias_bound_sq
     shots = max(1, math.ceil(variance_bound / room)) if room > 0 else None
     if shots is not None:
@@ -85,10 +93,16 @@ def field_budget(raw, implementation_allowance, target_rms, polar=True):
             math.sqrt(bias_sq + variance / shots) if shots is not None else None
         ),
         "expected_relative_field_rms_bound": (
-            math.sqrt(bias_bound_sq + variance_bound / shots) if shots is not None else None
+            math.sqrt(bias_bound_sq + variance_bound / shots)
+            if shots is not None
+            else None
         ),
-        "noiseless_10000_shot_expected_relative_field_rms": math.sqrt(bias_sq + variance / 10000),
-        "10000_shot_expected_relative_field_rms_bound": math.sqrt(bias_bound_sq + variance_bound / 10000),
+        "noiseless_10000_shot_expected_relative_field_rms": math.sqrt(
+            bias_sq + variance / 10000
+        ),
+        "10000_shot_expected_relative_field_rms_bound": math.sqrt(
+            bias_bound_sq + variance_bound / 10000
+        ),
     }
     if polar:
         result.update(

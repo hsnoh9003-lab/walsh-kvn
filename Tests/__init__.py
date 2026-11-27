@@ -1,1 +1,1 @@
-"""Standalone regression and scientific smoke tests for Source/."""
+"""Public platform-compatibility smoke checks."""

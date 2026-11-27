@@ -4,6 +4,15 @@ Solve on the upper half-domain with damped Newton iteration and Reynolds
 continuation, then reflect the solution for full-field sampling. Lengths are
 scaled by cylinder diameter; inlet speed and diameter are both one.
 """
+
+# Direct-file execution must locate Codes/ independently of the working directory.
+if __package__ in (None, ""):
+    import sys as _path_sys
+    from pathlib import Path as _Path
+    _codes = next(p for p in _Path(__file__).resolve().parents
+                  if (p / "Source/data_locations.py").is_file())
+    _path_sys.path.insert(0, str(_codes))
+
 import os
 
 for key in ['OPENBLAS_NUM_THREADS', 'OMP_NUM_THREADS', 'MKL_NUM_THREADS']:
@@ -438,4 +447,5 @@ if __name__ == '__main__':
         quadrature_order=5,
         domain_status='Explicit finite-domain FEM benchmark; not reconstruction of the Geneva-Zabaras OpenFOAM release.',
     )
-    solve_case(config, ROOT / 'results' / args.name, args.warm, args.stability)
+    from Source.data_locations import generated_outputs_root
+    solve_case(config, generated_outputs_root() / 'CFD/fem/results' / args.name, args.warm, args.stability)

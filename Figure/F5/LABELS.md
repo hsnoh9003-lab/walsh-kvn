@@ -1,1 +1,0 @@
-Panel a colour legend: Near stable (blue), Interior (purple), Near unstable (red). Diamonds: Shot-noise-free; squares: Sampled, 95% range. Captions define x_0 before truncation to [0,1]. The numerical series and point order are unchanged. Regenerate all artwork with code/reproduce_figure.py.

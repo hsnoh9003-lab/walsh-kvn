@@ -69,7 +69,7 @@ simulate.py: Re를 매개변수로 받는 시간 전파.
 - reference-replay는 공통 Source_Data의 Shared_source_data/CFD_ROM/FEM/inputs/steady_coarse.npz를 사용한다.
 - --data-root /path/to/Source_Data 또는 KVN_SOURCE_DATA로 위치를 지정할 수 있다.
 - 로컬 자료가 없으면 기존 Zenodo resolver가 캐시/다운로드를 처리한다. 명시한 데이터 경로가 잘못되었거나 정상장 파일을 찾지 못하면 solver 출력 폴더 생성 전에 종료한다.
-- 시간별 항력·양력의 원본 재현: 코드 루트에서 python -m Reproduction.reproduce_cfd_forces --verify
+- 시간별 항력·양력의 원본 재현: 코드 루트에서 python -m Source.CFD.reproduce_cfd_forces --verify
 - 이 명령은 복구한 별도 원본 해석기로 압력·점성 항력과 양력을 모두 계산한다.
 - 일반 simulate.py는 검수된 속도 시간발전 코드로 보존한다. 원래 Fig. 4의 힘 재현에는 위 명령을 사용한다.
 

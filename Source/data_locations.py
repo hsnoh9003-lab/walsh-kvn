@@ -1,6 +1,6 @@
 """Read-only Source Data resolver, with a Zenodo DOI download fallback.
 
-Use ``Source_Data/`` next to ``Codes/`` or set ``KVN_SOURCE_DATA`` for
+Use ``Source_Data/`` next to the cloned GitHub repository or set ``KVN_SOURCE_DATA`` for
 offline use. Otherwise, the first data access downloads the public Zenodo
 ``Source_Data.zip`` into a persistent cache (DOI: 10.5281/zenodo.24505927).
 """
@@ -20,9 +20,17 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 @lru_cache(maxsize=1)
 def source_data_root() -> Path:
+    """Find a manifest-bearing data directory, falling back to the configured downloader."""
     explicit = os.environ.get("KVN_SOURCE_DATA")
-    candidates = [Path(explicit)] if explicit else [REPO_ROOT.parent / "Source_Data",
-                                                  REPO_ROOT / "Source_Data", cached_path()]
+    candidates = (
+        [Path(explicit)]
+        if explicit
+        else [
+            REPO_ROOT.parent / "Source_Data",
+            REPO_ROOT / "Source_Data",
+            cached_path(),
+        ]
+    )
     for candidate in candidates:
         resolved = candidate.expanduser().resolve()
         if (resolved / "manifest.csv").is_file():
@@ -45,6 +53,7 @@ def set_source_data_root(directory: str | Path) -> Path:
 
 @lru_cache(maxsize=1)
 def _original_to_published() -> dict[str, str]:
+    """Map historical input paths to published paths using the dataset manifest."""
     with (source_data_root() / "manifest.csv").open(
         newline="", encoding="utf-8-sig"
     ) as handle:
@@ -59,6 +68,11 @@ def _original_to_published() -> dict[str, str]:
 def published_path(original_relative_path: str) -> Path:
     """Resolve a documented input/output path, including before it is written."""
     key = original_relative_path.replace("\\", "/").lstrip("./")
+    external_prefix = "Comparisons/KvN_LCHS/source_replay/QuCF/"
+    if key.startswith(external_prefix):
+        from .qucf_inputs import input_path
+
+        return input_path(key[len(external_prefix) :])
     published = _original_to_published().get(key)
     if published is None:
         raise KeyError(f"No Source_Data manifest entry for {key}")
@@ -87,7 +101,17 @@ def figure_data(figure: str) -> Path:
 
 
 def shared_data(*parts: str) -> Path:
+    """Resolve a shared dataset path, including the separately cached QuCF inputs."""
+    if parts[:2] == ("RE_common", "LCHS_source_inputs"):
+        from .qucf_inputs import input_root
+
+        return input_root() / Path(*parts[2:])
     return source_data_root() / "Shared_source_data" / Path(*parts)
+
+
+def generated_outputs_root() -> Path:
+    """Stage non-publication results in Source_Data, never alongside code."""
+    return source_data_root() / "Generated_Outputs"
 
 
 def source_label(path: str | Path) -> str:
@@ -103,7 +127,10 @@ def source_label(path: str | Path) -> str:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Locate/download Zenodo Source Data")
-    parser.add_argument("--download", action="store_true",
-                        help="Fetch public DOI data if it is not already local")
+    parser.add_argument(
+        "--download",
+        action="store_true",
+        help="Fetch public DOI data if it is not already local",
+    )
     parser.parse_args()
     print(source_data_root())

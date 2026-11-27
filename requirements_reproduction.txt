@@ -1,0 +1,7 @@
+-c requirements_verified.txt
+-r requirements_notebook.txt
+-r Source/CFD/force_replay/requirements.txt
+h5py
+nbclient
+nbconvert
+nbformat

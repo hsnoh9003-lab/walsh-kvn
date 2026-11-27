@@ -1,16 +1,22 @@
 """Surface-code core and distillation costs for compiled circuit inventories."""
+
 from __future__ import annotations
 
 import csv
 import math
 from dataclasses import dataclass
-from functools import lru_cache
+from functools import cached_property, lru_cache
 from pathlib import Path
 from typing import Dict
 from Source.data_locations import source_file
 
 from .core_timing import core_interval_seconds
 
+# ETA is the implementation-error allowance for one circuit attempt.
+# It is distinct from the target relative field RMS error and sampling error.
+#
+# CORE_FIXED_TILES denotes the 18 fixed core patches added to the data block
+# and correction-storage allocation.
 ETA = 1e-4
 CORE_FIXED_TILES = 18.0
 PHYSICAL_PATCH_MODEL = "2dplus1_sq"
@@ -18,10 +24,19 @@ PHYSICAL_PATCH_MODEL = "2dplus1_sq"
 
 @dataclass(frozen=True)
 class ModelConfig:
+    """Surface-code, hardware-timing and measured-preparation inputs to the cost model."""
+
     n_L: int = 11
     data_block: str = "compact"
 
-    # Hardware times are in seconds.
+    # Hardware times are expressed in seconds.
+    # The current defaults are W=1 us per surface-code round and gamma=10 us
+    # for classical reaction.
+    # One code cycle at distance d comprises d surface-code rounds.
+    #
+    # Calculations use ModelConfig directly; hardware.json is not loaded here.
+    # The standard search configuration in preparation.make_config() overrides
+    # the distance range with d_min=13 and d_max=49 by default.
     t_round: float = 1e-6
     t_react: float = 10e-6
     p_phys: float = 1e-4
@@ -34,7 +49,9 @@ class ModelConfig:
     L_max: int = 2
     d_cult: int = 3
     prep_degree_table_path: str = ""
-    gidney_footprint_table_path: str = str(source_file("Data/RE/gidney_circuit_footprints.csv"))
+    # Empty selects the recorded publication footprint table when area is evaluated.
+    # Importing the model or requesting CLI help does not require that dataset.
+    gidney_footprint_table_path: str = ""
 
     O_1: int = 13
     O_higher: int = 15
@@ -43,12 +60,20 @@ class ModelConfig:
     distill_logical_coeff: float = 7.1
     accept_input_coeff: float = 15.0
 
+    @cached_property
+    def resolved_gidney_footprint_table_path(self) -> str:
+        """Resolve once per configuration, only when a footprint is required."""
+        return self.gidney_footprint_table_path or str(
+            source_file("Data/RE/gidney_circuit_footprints.csv")
+        )
+
     @property
     def W_seconds(self) -> float:
-        """Read-only spelling used by Data/Radial128/reproduce_resources.py."""
+        """Compatibility alias for the duration of one surface-code round."""
         return self.t_round
 
     def validate(self) -> None:
+        """Check supported block names, code-distance bounds and positive hardware settings."""
         if self.data_block not in {"compact", "intermediate", "fast"}:
             raise ValueError("Unknown data_block")
         if self.n_L < 1 or int(self.n_L) != self.n_L:
@@ -68,6 +93,7 @@ class ModelConfig:
 
 
 def clamp_probability(x: float) -> float:
+    """Clip a scalar probability to the closed interval [0, 1]."""
     return min(max(float(x), 0.0), 1.0)
 
 
@@ -101,14 +127,18 @@ def ceil_int(x: float) -> int:
 
 @lru_cache(maxsize=16)
 def _load_gidney_degree_table_cached(path_str: str) -> Dict[int, Dict[str, float]]:
-    """Load a degree-indexed Gidney preparation table from CSV.
+    """Load measured preparation data indexed by output code distance.
 
-    Required columns: degree (or d2), e_prep, P_prep.
+    Required columns are degree, or d2, together with e_prep and P_prep.
+    The distance index is the preparation output distance, not a polynomial
+    degree.
 
-    For the current Gidney table, ``e_prep`` is already the T-state estimate
-    e_T ~= 2*e_S, where e_S=errors/kept comes from the stabilizer end-to-end
-    simulation. The table already includes this factor.  The table is deliberately exact: no interpolation/extrapolation
-    is performed.
+    e_prep already includes the conversion e_T approximately equal to 2*e_S,
+    where e_S is estimated from logical errors among accepted simulation shots.
+    P_prep is the preparation acceptance probability.
+
+    Only explicitly tabulated distances are supported. No interpolation or
+    extrapolation is performed.
     """
     path = Path(path_str).expanduser().resolve()
     if not path.exists():
@@ -118,7 +148,9 @@ def _load_gidney_degree_table_cached(path_str: str) -> Dict[int, Dict[str, float
     with path.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         fields = set(reader.fieldnames or [])
-        degree_col = "degree" if "degree" in fields else ("d2" if "d2" in fields else None)
+        degree_col = (
+            "degree" if "degree" in fields else ("d2" if "d2" in fields else None)
+        )
         required = {"e_prep", "P_prep"}
         if degree_col is None or not required.issubset(fields):
             raise ValueError(
@@ -132,7 +164,9 @@ def _load_gidney_degree_table_cached(path_str: str) -> Dict[int, Dict[str, float
             if d in rows:
                 raise ValueError(f"Duplicate degree={d} in {path}")
             if d <= 0 or not (0.0 <= e <= 1.0) or not (0.0 < P <= 1.0):
-                raise ValueError(f"Invalid Gidney table row for degree={d}: e_prep={e}, P_prep={P}")
+                raise ValueError(
+                    f"Invalid Gidney table row for degree={d}: e_prep={e}, P_prep={P}"
+                )
             rows[d] = {"e_prep": e, "P_prep": P}
     if not rows:
         raise ValueError(f"No rows found in Gidney degree table: {path}")
@@ -157,7 +191,12 @@ def gidney_degree_table_row(d_1: int, cfg: ModelConfig) -> Dict[str, float]:
     return table[d]
 
 
+# p_L is the logical failure probability of one patch per surface-code round.
+# memory_error() accumulates this probability over d rounds, corresponding
+# to one code cycle at distance d.
+# Each probability must be paired with an exposure measured in its own units.
 def logical_error_per_round(p_phys: float, d: int, cfg: ModelConfig) -> float:
+    """Evaluate the distance-dependent logical error probability per QEC round."""
     p_phys = float(p_phys)
     d = int(d)
     if p_phys <= 0:
@@ -173,20 +212,46 @@ def memory_error(d: int, p_phys: float, cfg: ModelConfig) -> float:
 
 
 def growth_error(d_from: int, d_to: int, p_phys: float, cfg: ModelConfig) -> float:
-    """A growing patch spends one memory cycle at the source distance (S49)."""
+    """Assign one source-distance memory cycle when increasing the code distance.
+
+    No additional growth error is assigned when the distance is unchanged
+    or reduced.
+    """
     return memory_error(d_from, p_phys, cfg) if int(d_to) > int(d_from) else 0.0
 
 
-def distillation_level_metrics(e_in: float, p_phys: float, d: int,
-                               cfg: ModelConfig) -> tuple[float, float]:
-    """Return the output error and acceptance probability of one distillation batch."""
+def distillation_level_metrics(
+    e_in: float, p_phys: float, d: int, cfg: ModelConfig
+) -> tuple[float, float]:
+    """Return the output-state error and batch acceptance probability.
+
+    The adopted Silva model uses
+        e_out = 35*e_in**3 + 7.1*e_cliff,
+        P_l = 1 - 15*e_in - 356*e_cliff.
+
+    Here, e_cliff is the memory error over one code cycle at the current
+    distillation distance. It is unrelated to the number of Clifford gates
+    stored in the circuit inventory.
+
+    The output error contributes to implementation error, whereas acceptance
+    determines the mean rate of usable outputs.
+    """
     e_cliff = memory_error(d, p_phys, cfg)
-    e_out = clamp_probability(cfg.distill_cubic_coeff * float(e_in)**3
-                              + cfg.distill_logical_coeff * e_cliff)
+    e_out = clamp_probability(
+        cfg.distill_cubic_coeff * float(e_in) ** 3 + cfg.distill_logical_coeff * e_cliff
+    )
     P_l = 1.0 - cfg.accept_input_coeff * float(e_in) - 356.0 * e_cliff
     return e_out, P_l
 
 
+# Propagate errors from the prepared input state to the core interface.
+# At each level, combine the incoming error with distance-growth error,
+# apply distillation, and then add the output-routing error.
+# Finally, include growth from the last factory distance to d_core.
+#
+# When u_levels is omitted, unit-dependent routing errors are excluded.
+# This provides an initial estimate for factory sizing.
+# Candidate architectures are reevaluated with their actual unit counts.
 def evaluate_factory_distances(p_phys, d_core, d_levels, cfg, u_levels=None):
     """Evaluate a factory chain, with output-routing exposure once unit counts are known."""
     d_levels = tuple(map(int, d_levels))
@@ -197,7 +262,9 @@ def evaluate_factory_distances(p_phys, d_core, d_levels, cfg, u_levels=None):
         u_levels = tuple(map(int, u_levels))
         if len(u_levels) != L or min(u_levels) < 1:
             raise ValueError("Each distillation level needs a positive unit count")
-    if any(d % 2 == 0 or not cfg.d_min <= d <= min(cfg.d_max, d_core) for d in d_levels):
+    if any(
+        d % 2 == 0 or not cfg.d_min <= d <= min(cfg.d_max, d_core) for d in d_levels
+    ):
         return None
     if any(left > right for left, right in zip(d_levels, d_levels[1:])):
         return None
@@ -214,7 +281,7 @@ def evaluate_factory_distances(p_phys, d_core, d_levels, cfg, u_levels=None):
         if u_levels is not None:
             N_path = mean_silva_path_patches(u_levels[i], level=i + 1)
             p_L = logical_error_per_round(p_phys, d_l, cfg)
-            e_path = clamp_probability(-math.expm1((N_path*d_l)*math.log1p(-p_L)))
+            e_path = clamp_probability(-math.expm1((N_path * d_l) * math.log1p(-p_L)))
             e_out = combine_independent(e_out, e_path)
         d_prev = d_l
     e_MSF = combine_independent(e_out, growth_error(d_prev, d_core, p_phys, cfg))
@@ -238,20 +305,27 @@ def mean_silva_path_patches(units: int, level: int = 1) -> float:
     return 1.0 + spacing * ((u * u) // 4) / u
 
 
+# Convert the compiled logical width into a data-block patch count.
+# Round up before evaluating physical area or logical-error exposure.
+# The fixed core patches and correction storage are added separately.
 def data_block_tiles(n_L: int, data_block: str) -> int:
     """Return the data-block patch count N_blk from Table S6."""
     if int(n_L) != n_L or n_L < 1:
         raise ValueError("n_L must be a positive integer")
     n_L = int(n_L)
     if data_block == "compact":
-        return math.ceil(1.5*n_L + 3.0)
+        return math.ceil(1.5 * n_L + 3.0)
     if data_block == "intermediate":
-        return 2*n_L + 4
+        return 2 * n_L + 4
     if data_block == "fast":
-        return math.ceil(2.0*n_L + math.sqrt(8.0*n_L) + 1.0)
+        return math.ceil(2.0 * n_L + math.sqrt(8.0 * n_L) + 1.0)
     raise ValueError(f"Unknown data_block={data_block!r}")
 
 
+# b is the nominal number of code cycles required per consumed T state:
+# 9 for compact, 5 for intermediate, and 1 for fast data blocks.
+# The corresponding gate interval is b*d_core*t_round.
+# Classical reaction and factory supply may increase the actual interval.
 def block_cycles_per_T(data_block: str) -> float:
     if data_block == "compact":
         return 9.0
@@ -263,7 +337,12 @@ def block_cycles_per_T(data_block: str) -> float:
 
 
 def reaction_storage_tiles(d_region: int, cfg: ModelConfig) -> float:
-    """Correction storage at the core or factory level's own distance."""
+    """Return correction-storage and bus area in local-distance patch units.
+
+    Use d_core for core storage and the corresponding d_l for factory storage.
+    The factor 1.5 is an area conversion, so fractional patch-equivalent values
+    are retained.
+    """
     return 1.5 * ceil_int(cfg.t_react / (cfg.t_round * int(d_region)))
 
 
@@ -272,12 +351,20 @@ def core_tile_count(d_core: int, cfg: ModelConfig) -> dict:
     N_corr_bus = reaction_storage_tiles(d_core, cfg)
     N_core = N_blk + CORE_FIXED_TILES + N_corr_bus
     # These keys are also consumed by the standalone Litinski table generator.
-    return {"data_block_tiles": N_blk, "reaction_storage_tiles": N_corr_bus,
-            "N_core_tiles": N_core}
+    return {
+        "data_block_tiles": N_blk,
+        "reaction_storage_tiles": N_corr_bus,
+        "N_core_tiles": N_core,
+    }
 
 
 def level1_c_prep(d_1: int, cfg: ModelConfig) -> float:
-    """Preparation and decoding in units of d_first rounds."""
+    """Express preparation and decoding time in first-level code cycles.
+
+    Preparation occupies 13 physical rounds plus the classical reaction time.
+    Divide this duration by d_1*t_round and round up.
+    For W=1 us and gamma=10 us, the result is ceil(23/d_1).
+    """
     return float(ceil_int((13.0 + cfg.t_react / cfg.t_round) / int(d_1)))
 
 
@@ -290,8 +377,10 @@ def physical_patch_qubits(d: int) -> int:
 def _read_gidney_footprints(path: str):
     with open(path, newline="", encoding="utf-8") as fh:
         rows = list(csv.DictReader(fh))
-    return {(int(row["d_cult"]), int(row["d_esc"])): int(row["physical_qubits_q"])
-            for row in rows}
+    return {
+        (int(row["d_cult"]), int(row["d_esc"])): int(row["physical_qubits_q"])
+        for row in rows
+    }
 
 
 def gidney_physical_qubits(d_esc: int, cfg: ModelConfig) -> int:
@@ -299,10 +388,12 @@ def gidney_physical_qubits(d_esc: int, cfg: ModelConfig) -> int:
 
     The observed 2*d_esc**2+4 law is deliberately NOT extrapolated.
     """
-    data = _read_gidney_footprints(cfg.gidney_footprint_table_path)
+    data = _read_gidney_footprints(cfg.resolved_gidney_footprint_table_path)
     key = (int(cfg.d_cult), int(d_esc))
     if key not in data:
-        raise ValueError(f"No recorded Gidney circuit footprint for {key}; do not extrapolate.")
+        raise ValueError(
+            f"No recorded Gidney circuit footprint for {key}; do not extrapolate."
+        )
     return data[key]
 
 
@@ -312,7 +403,15 @@ def distillation_duration(level: int, d_l: int, cfg: ModelConfig) -> float:
 
 
 def size_factory_units(factory, d_core, cfg):
-    """Find the minimum units meeting D_L >= C_core and D_(l-1) >= C_l."""
+    """Size factory levels backwards from the core's required output rate.
+
+    The usable output rate of level l is u_l*P_l/tau_l.
+    Choose an integer unit count sufficient to meet the required rate.
+
+    The preceding level must supply 15*u_l/tau_l inputs per second.
+    This input demand is not multiplied by P_l because every distillation
+    attempt consumes its inputs, including attempts that are rejected.
+    """
     d_levels = factory["d_levels"]
     P_levels = factory["P_levels"]
     if any(P_l <= 0 for P_l in P_levels):
@@ -322,7 +421,7 @@ def size_factory_units(factory, d_core, cfg):
     u_levels = [0] * len(d_levels)
     throughput_ok = True
     for i in reversed(range(len(d_levels))):
-        tau_l = distillation_duration(i+1, d_levels[i], cfg)
+        tau_l = distillation_duration(i + 1, d_levels[i], cfg)
         u_l = max(1, ceil_int(C_required * tau_l / P_levels[i]))
         D_l = u_l * P_levels[i] / tau_l
         throughput_ok = throughput_ok and D_l + 1e-18 >= C_required
@@ -331,6 +430,12 @@ def size_factory_units(factory, d_core, cfg):
     return tuple(u_levels), throughput_ok
 
 
+# Evaluate the core and each factory level at their respective code distances.
+# A padded surface-code patch occupies Q_surface(d)=2*(d+1)**2 physical qubits.
+#
+# The shared output bus at a level spans 1+spacing*(u_l-1) patches.
+# Do not substitute the mean routing distance used in the error calculation
+# for this full-area allocation.
 def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
     """Evaluate core and factory areas at the level-local pitches (S59–S66)."""
     d_levels = tuple(map(int, code_distances))
@@ -340,9 +445,15 @@ def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
 
     core = core_tile_count(d_core, cfg)
     Q_core = core["N_core_tiles"] * physical_patch_qubits(d_core)
+
+    # Determine the parallel preparation allocation from its acceptance
+    # probability and duration in first-level code cycles.
+    # Each preparation allocation uses the larger of the padded patch footprint
+    # and the recorded complete Gidney circuit footprint.
+    # Recorded preparation footprints are not extrapolated to unlisted distances.
     P_prep = gidney_degree_table_row(d_levels[0], cfg)["P_prep"]
     c_prep = level1_c_prep(d_levels[0], cfg)
-    prep_tiles_per_unit = (15.0/13.0) * (c_prep + P_prep) / P_prep
+    prep_tiles_per_unit = (15.0 / 13.0) * (c_prep + P_prep) / P_prep
     Q_MSF = 0.0
     storage_by_level = []
     for i, (d_l, u_l) in enumerate(zip(d_levels, u_levels)):
@@ -352,7 +463,9 @@ def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
         fixed = 29 if i == 0 else 28
         # One shared bus has 1 + spacing*(u_l - 1) patches (S59).
         if i == 0:
-            n_tiles = u_l * (fixed + spacing + prep_tiles_per_unit + N_corr_bus) - (spacing - 1)
+            n_tiles = u_l * (fixed + spacing + prep_tiles_per_unit + N_corr_bus) - (
+                spacing - 1
+            )
             n_0 = prep_tiles_per_unit * u_l
             Q_prep_unit = max(Q_surface, gidney_physical_qubits(d_l, cfg))
             Q_MSF += (n_tiles - n_0) * Q_surface + n_0 * Q_prep_unit
@@ -360,13 +473,25 @@ def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
             n_tiles = u_l * (fixed + spacing + N_corr_bus) - (spacing - 1)
             Q_MSF += n_tiles * Q_surface
         storage_by_level.append(N_corr_bus)
-    return {"Q": Q_core + Q_MSF, "Q_core": Q_core, "Q_MSF": Q_MSF,
-            "N_corr_bus_core": core["reaction_storage_tiles"],
-            "N_corr_bus_levels": tuple(storage_by_level)}
+    return {
+        "Q": Q_core + Q_MSF,
+        "Q_core": Q_core,
+        "Q_MSF": Q_MSF,
+        "N_corr_bus_core": core["reaction_storage_tiles"],
+        "N_corr_bus_levels": tuple(storage_by_level),
+    }
 
 
 def core_volumes(N_T: int, cfg: ModelConfig, d_core: int) -> tuple[float, float]:
-    """Return V_act and V_idle,base in patch-cycles (S67a)–(S67b)."""
+    """Return active and baseline memory exposure in patch-cycles.
+
+    Active exposure includes the data block and fixed core patches.
+    Baseline memory exposure includes all core patches, including correction
+    storage.
+
+    Additional exposure from classical reaction and supply waiting is evaluated
+    separately in patch-rounds.
+    """
     b = block_cycles_per_T(cfg.data_block)
     N_core = core_tile_count(d_core, cfg)["N_core_tiles"]
     N_active = data_block_tiles(cfg.n_L, cfg.data_block) + CORE_FIXED_TILES

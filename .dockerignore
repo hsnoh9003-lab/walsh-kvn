@@ -1,0 +1,15 @@
+.git
+.venv*
+Work_Notes
+**/__pycache__
+**/*.pyc
+**/*.so
+**/*.pyd
+**/*.dll
+**/.ipynb_checkpoints
+Source_Data
+Generated_Outputs
+.env
+.env.*
+
+# Figure previews are retained in the Source_Data input mount, not the image.

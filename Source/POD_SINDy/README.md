@@ -13,29 +13,21 @@ It imports the active modules directly:
 - `identification.py`: the shared monomial library, time derivatives, and guarded ODE prediction.
 - `evaluate_degree_cases.py`: additional-case and blocked-validation evaluation.
 
-`legacy/` retains historical alternatives and standalone analysis helpers. These
-are callable but are not dependencies of the current snapshot-to-model replay.
-The historical mean-window selection in `legacy.original_rom_functions.make_basis`
-is distinct from the recorded mean-window protocol in `replay_frozen_basis`.
+Historical variants are retained in the separate internal archive and are not
+importable production modules. The active snapshot-to-model replay above remains
+the scientific reference for the public execution.
 
 | Former location | Implementation now |
 | --- | --- |
-| `recovered_original.original_rom_functions.project`, `.closure` | `pod` |
-| `recovered_original.shift_pipeline.reflect`, `.decompose`, `.fit_oscillatory_pair` | `pod` |
-| Both copies of the polynomial/derivative/ODE helpers | `identification` |
-| Generic unconstrained SINDy regression and equation-display helpers | `legacy.identification` |
-| Historical basis construction, physical-model check, weighted fitting | `legacy.original_rom_functions` |
-| Alternative shift construction and reduced-model diagnostics | `legacy.shift_pipeline` |
+| POD projection and shift closure | `pod` |
+| Reflection decomposition and oscillatory POD pair | `pod` |
+| Polynomial, derivative and guarded ODE helpers | `identification` |
+| Reflection-constrained fit | `fit` |
 
-The three files under `recovered_original/` now only forward imports. They retain
-old import paths for external collaborators; they contain no duplicate numerical
-implementations. Historical names such as `identification.learn` also remain
-available through lazy compatibility lookup, while new callers should import
-these optional helpers from `legacy.identification` explicitly.
+The release does not distribute compatibility import shims or alternative
+historical implementations. Original producer programs that are necessary to
+replay publication CSVs are in `Source/Data_Production/producers/`.
 
-To check the layout, old import compatibility, and numerical input guards:
-
-```bash
-python -m Tests.verify_pod_module_layout
-python -m Tests.verify_core_guards
-```
+Additional implementation-regression tests are maintained outside the public
+release; the public end-to-end workflow is documented in
+`../../docs/REPRODUCTION_GUIDE.md`.

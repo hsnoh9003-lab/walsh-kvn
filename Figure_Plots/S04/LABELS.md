@@ -1,0 +1,1 @@
+Labels are regenerated with `python code/plot.py`. The source artwork referenced by earlier internal notes is not part of this release and is not required by the renderer. Scientific data are obtained through the shared Source Data resolver. Label rendering performs no new resource optimization.

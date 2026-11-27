@@ -36,7 +36,7 @@ def _file_entry() -> dict:
     except (urllib.error.URLError, ValueError, TimeoutError) as exc:
         raise RuntimeError(
             f"Zenodo record {DOI} is unavailable or not yet public. "
-            "Until publication, put Source_Data/ beside Codes/ or set KVN_SOURCE_DATA."
+            "Until publication, put Source_Data/ beside the cloned repository or set KVN_SOURCE_DATA."
         ) from exc
     files = record.get("files", [])
     exact = [item for item in files if item.get("key", "").lower() == "source_data.zip"]
