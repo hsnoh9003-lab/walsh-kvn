@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: If you use this software, please cite the accompanying paper below and the source dataset at
+  https://doi.org/10.5281/zenodo.24505927.
+type: software
+license: Apache-2.0
+title: 'Walsh–KvN: research code for Nonlinearity-preserving quantum simulation of flows in the early
+  fault-tolerant regime'
+authors:
+- family-names: Noh
+  given-names: Hansol
+- family-names: Oh
+  given-names: Unam
+- family-names: Baek
+  given-names: Sangkyu
+- family-names: Ahn
+  given-names: Doyeol (David)
+repository-code: https://github.com/hsnoh9003-lab/walsh-kvn
+preferred-citation:
+  type: article
+  title: Nonlinearity-preserving quantum simulation of flows in the early fault-tolerant regime
+  authors:
+  - family-names: Noh
+    given-names: Hansol
+  - family-names: Oh
+    given-names: Unam
+  - family-names: Baek
+    given-names: Sangkyu
+  - family-names: Ahn
+    given-names: Doyeol (David)
+  year: 2026
+  url: https://arxiv.org/abs/2611.23196

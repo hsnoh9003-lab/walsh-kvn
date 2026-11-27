@@ -1,0 +1,26 @@
+Walsh–KvN research code
+Nonlinearity-preserving quantum simulation of flows in the early fault-tolerant regime
+
+Copyright 2026 Hansol Noh, Unam Oh, Sangkyu Baek and Doyeol (David) Ahn.
+
+Original code and code documentation contributed by this project are licensed
+under the Apache License, Version 2.0; see LICENSE. This statement does not
+relicense third-party software, upstream reference inputs, or the separate
+Source_Data dataset. The author-generated dataset is licensed under CC BY 4.0
+as described in Source_Data/LICENSE.
+
+The cultivation regeneration paths use Strilanc/magic-state-cultivation:
+https://github.com/Strilanc/magic-state-cultivation
+The distillation catalogue regeneration uses litinski/magicstates:
+https://github.com/litinski/magicstates
+Both external packages are published under Apache License 2.0 and retain
+their original copyrights and applicable notices. Their implementations are
+obtained separately; see THIRD_PARTY_NOTICES.md for the calling paths.
+
+The KvN–LCHS comparison uses pinned reference inputs from QuCF/QuCF:
+https://github.com/QuCF/QuCF
+Their redistribution licence was not identified in the checked revision.
+The 32 original input files are not included in this release. The reproduction
+helper retrieves them directly from the original repository into a separate
+local cache and verifies their recorded hashes. Neither this NOTICE nor this
+project's licences grant rights to upstream QuCF material.
