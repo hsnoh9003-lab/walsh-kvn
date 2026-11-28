@@ -199,7 +199,7 @@ def resource_selections(root, out):
     by_case = {(float(r["p_phys"]), int(r["native_T"])): r for r in sensitivity}
     write(out / "Table_S8_current.csv", [by_case[k] for k in design_points])
 
-    # Source table for SI S9 uses different time units for the block-encoded task.
+    # Source table for SI S10 uses different time units for the block-encoded task.
     be = rows(cm / "RE_common/Regenerated/RE_BE_one_clean/selected.csv")
     result = []
     for label, model, selection in (
@@ -390,7 +390,7 @@ def generator_norm_rows(root):
             ]
         )
         alpha = load(
-            root / "Tables/Table_S11/BE_fullwindow_inventory/literal_joint_counts.json"
+            root / "Tables/Table_S12/BE_fullwindow_inventory/literal_joint_counts.json"
         )["normalization_alpha"]
         radial, joint_norm = abs(eig[:, 0]).max(), abs(eig).max()
         labels = (

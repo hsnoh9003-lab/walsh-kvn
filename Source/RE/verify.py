@@ -101,6 +101,6 @@ def check():
     assert pareto_indices_4d([1,2,3],[1,2,1],[1,1,2],[1,2,1]).tolist()==[0]
     print(json.dumps({'status':'PASS','reference_rows':totals,
         'factory_distance_invariance':'PASS', 'tile_rounding':'PASS',
-        'QEC_round':'1us','error_model':'full Silva 15-to-1 acceptance (S45)'},indent=2))
+        'QEC_round':'1us','error_model':'full Silva 15-to-1 acceptance (S48)'},indent=2))
 
 if __name__=='__main__':check()

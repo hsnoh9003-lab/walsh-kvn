@@ -322,7 +322,7 @@ def all_routes() -> tuple[Route, ...]:
     many(
         "lchs_counts",
         "Generated_Outputs/Comparisons/KvN_LCHS/source_replay/audit/results",
-        "Tables/Table_S10/LCHS_source_counts",
+        "Tables/Table_S11/LCHS_source_counts",
         ("dt1_stmc_histogram.csv", "t2_stmc_histogram.csv"),
     )
 

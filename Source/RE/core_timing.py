@@ -21,7 +21,7 @@ waiting. Supply waiting alone is measured by tau_T-tau_core.
 
 
 def extra_idle_rounds_per_T(N_core, tau_gate, tau_T, t_round):
-    """Patch-rounds beyond b*d_core*t_round per consumed T state (S68–S69)."""
+    """Patch-rounds beyond b*d_core*t_round per consumed T state (S71–S72)."""
     return N_core * max(0.0, tau_T - tau_gate) / t_round
 
 

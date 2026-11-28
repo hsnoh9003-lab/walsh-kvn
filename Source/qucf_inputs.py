@@ -35,7 +35,7 @@ from Source.data_locations import source_data_root
 
 def manifest_path() -> Path:
     """Resolve the fixed upstream manifest only when the external data are used."""
-    return source_data_root() / "Tables/Table_S10/LCHS_source_counts/upstream_input_manifest.json"
+    return source_data_root() / "Tables/Table_S11/LCHS_source_counts/upstream_input_manifest.json"
 
 
 def entries() -> dict[str, dict]:

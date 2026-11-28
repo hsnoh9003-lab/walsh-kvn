@@ -296,7 +296,7 @@ def silva_output_spacing(level: int) -> int:
 
 
 def mean_silva_path_patches(units: int, level: int = 1) -> float:
-    """Mean output-to-centre distance, including the one-patch connection (S50)."""
+    """Mean output-to-centre distance, including the one-patch connection (S53)."""
     u = int(units)
     if u != units or u < 1:
         raise ValueError("factory units must be a positive integer")
@@ -437,7 +437,7 @@ def size_factory_units(factory, d_core, cfg):
 # Do not substitute the mean routing distance used in the error calculation
 # for this full-area allocation.
 def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
-    """Evaluate core and factory areas at the level-local pitches (S59–S66)."""
+    """Evaluate core and factory areas at the level-local pitches (S62–S69)."""
     d_levels = tuple(map(int, code_distances))
     u_levels = tuple(map(int, u_levels))
     if L < 1 or len(d_levels) != L or len(u_levels) != L:
@@ -461,7 +461,7 @@ def compute_total_qubits(L, u_levels, code_distances, *, d_core, cfg):
         Q_surface = physical_patch_qubits(d_l)
         spacing = silva_output_spacing(i + 1)
         fixed = 29 if i == 0 else 28
-        # One shared bus has 1 + spacing*(u_l - 1) patches (S59).
+        # One shared bus has 1 + spacing*(u_l - 1) patches (S62).
         if i == 0:
             n_tiles = u_l * (fixed + spacing + prep_tiles_per_unit + N_corr_bus) - (
                 spacing - 1

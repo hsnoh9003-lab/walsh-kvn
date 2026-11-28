@@ -25,7 +25,7 @@ from Source.data_locations import published_path, source_data_root, generated_ou
 
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE / "source_replay"
-ARCHIVE = source_data_root() / "Tables/Table_S10/LCHS_source_counts"
+ARCHIVE = source_data_root() / "Tables/Table_S11/LCHS_source_counts"
 
 
 def main():

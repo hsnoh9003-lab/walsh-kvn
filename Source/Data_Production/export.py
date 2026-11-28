@@ -14,6 +14,11 @@ from pathlib import Path
 
 import numpy as np
 
+try:
+    from Source.Data_Production.data_assets import fixed_asset
+except ModuleNotFoundError:
+    from data_assets import fixed_asset
+
 
 def write(output, name, header, rows):
     with (output / name).open("w", newline="", encoding="utf-8") as handle:
@@ -87,9 +92,9 @@ def forces(data, out):
     write(out, "fig4f_walsh_forces.csv", ["step", "time", "C_D", "C_L"], result)
 
 
-def models(out):
+def models(out, data=None):
     """Tabulate scalar drifts, equilibria and coupled-vector arrows from the fixed protocol."""
-    protocol = json.loads(Path(__file__).with_name("model_protocol.json").read_text())
+    protocol = json.loads(fixed_asset("model_protocol.json", data=data).read_text())
     x = np.linspace(0, 1, 1001)
     curves, markers = [], []
     for label, record in zip(("Q2", "C3", "Q5"), protocol[:3], strict=True):
@@ -152,5 +157,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     forces(args.source_data, args.output)
-    models(args.output)
+    models(args.output, args.source_data)
     walsh_panel(args.output)

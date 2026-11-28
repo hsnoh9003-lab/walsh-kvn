@@ -1,4 +1,4 @@
-"""Parallel factory counts for the interlevel throughput constraints (S53–S55)."""
+"""Parallel factory counts for the interlevel throughput constraints (S56–S58)."""
 
 import math
 from .model import distillation_duration, evaluate_factory_distances, size_factory_units

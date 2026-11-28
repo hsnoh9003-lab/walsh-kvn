@@ -1,1 +1,1 @@
-Supplementary Figure S4 | How starting position affects scalar density. Rows vary drift and columns vary input (Table S4). Grey shows prepared density, blue the circuit after 64 steps to time 1 on 64 cells, and dashed black trajectories from the same cell probabilities.
+Supplementary Figure S4 | Effect of starting position on scalar density. Rows vary drift and columns vary input (Table S4). Grey shows prepared density, blue the circuit after 64 steps to time 1 on 64 cells, and dashed black trajectories from the same cell probabilities.

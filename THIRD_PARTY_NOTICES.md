@@ -58,7 +58,7 @@ These original files are excluded from both the code and Source Data releases.
 [`Source/qucf_inputs.py`](Source/qucf_inputs.py) retrieves them from the exact
 upstream commit into a local cache, verifies each byte count and SHA-256 digest,
 and reuses verified files offline. It does not grant an upstream licence.
-The existing [input manifest](../Source_Data/Tables/Table_S10/LCHS_source_counts/upstream_input_manifest.json)
+The existing [input manifest](../Source_Data/Tables/Table_S11/LCHS_source_counts/upstream_input_manifest.json)
 records the 32 inputs and two C++ engine files used for provenance; those engine
 implementations are also not bundled. The publication's resource tables and
 the project's reconstruction/validation code remain in the release.
