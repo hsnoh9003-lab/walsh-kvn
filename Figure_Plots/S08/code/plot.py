@@ -79,9 +79,9 @@ def sensitivity(folder):
     timing.set_yscale("log")
     timing.set_ylim(0.95, 150)
     for name, color, marker, label, face in [
-        ("Original 33-step data", PURPLE, "s", "Silva [40]", PURPLE),
-        ("A Game of Surface Codes", ORANGE, "^", "Litinski [39]", ORANGE),
-        ("Not as Costly", TEAL, "o", "Litinski [47]", "white"),
+        ("Original 33-step data", PURPLE, "s", "Silva [41]", PURPLE),
+        ("A Game of Surface Codes", ORANGE, "^", "Litinski [40]", ORANGE),
+        ("Not as Costly", TEAL, "o", "Litinski [48]", "white"),
     ]:
         sub = back[back.comparison_label.eq(name)].sort_values("p_phys")
         assert len(sub) == 8
