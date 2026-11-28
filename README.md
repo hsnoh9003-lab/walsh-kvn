@@ -36,7 +36,7 @@ On Windows, create the environment with `py -3.11 -m venv .venv` and activate it
 
 ### 2. Obtain Source Data
 
-**The Zenodo dataset is not yet published.** Use the supplied local `Source_Data` folder for this version. The planned public record is [Zenodo](https://doi.org/10.5281/zenodo.24505927). Arrange the local package as follows:
+Download and extract `Source_Data.zip` from the [Zenodo dataset record](https://doi.org/10.5281/zenodo.24505927), or use the supplied local `Source_Data` folder. Arrange the local package as follows:
 
 ```text
 publication/
@@ -53,9 +53,9 @@ publication/
 
 For another location, set `KVN_SOURCE_DATA` to the extracted data directory. Its root must contain `manifest.csv`, without an extra nested `Source_Data` folder.
 
-**The demo requires local data and does not download it.** Other entry points use [Source/data_locations.py](Source/data_locations.py), which prefers local data and can download `Source_Data.zip` from Zenodo if none are found. This fallback requires an accessible, published record and cannot replace the supplied local folder before publication. `python -m Source.data_locations --download` explicitly resolves/downloads the archive; `KVN_SOURCE_DATA_CACHE` overrides the default cache parent.
+**The demo requires local data and does not download it.** Other entry points use [Source/data_locations.py](Source/data_locations.py), which prefers local data and can download `Source_Data.zip` from Zenodo if none are found. This fallback requires an accessible, published record. `python -m Source.data_locations --download` explicitly resolves/downloads the archive; `KVN_SOURCE_DATA_CACHE` overrides the default cache parent.
 
-Keep the 987-payload dataset as the reference. The demo writes separate outputs; numerical regeneration uses a separate writable dataset.
+Keep the 993-payload dataset as the reference. The demo writes separate outputs; numerical regeneration uses a separate writable dataset.
 
 ### 3. Run the notebook
 
@@ -552,7 +552,7 @@ The S1 perturbation origin is the cylinder centre, lengths are cylinder diameter
 
 ## Citation and licences
 
-Cite the [paper](https://arxiv.org/abs/2611.23196); [CITATION.cff](CITATION.cff) supplies citation metadata. The planned [Zenodo dataset record](https://doi.org/10.5281/zenodo.24505927) is pending publication. Its data DOI identifies the dataset, not a specific code version.
+Cite the [paper](https://arxiv.org/abs/2611.23196); [CITATION.cff](CITATION.cff) supplies citation metadata. The data DOI ([Zenodo](https://doi.org/10.5281/zenodo.24505927)) identifies the dataset, not a specific code version.
 
 Original code and documentation use [Apache-2.0](LICENSE), with authorship/scope in [NOTICE](NOTICE). Author-generated Source Data are distributed separately under CC BY 4.0. [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists upstream software and licences.
 
